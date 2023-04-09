@@ -1,0 +1,280 @@
+-- CreateTable
+CREATE TABLE "api_keys" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "key" VARCHAR(255) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "api_keys_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "asset_tags" (
+    "media_asset_id" INTEGER NOT NULL,
+    "tag_id" INTEGER NOT NULL,
+
+    CONSTRAINT "asset_tags_pkey" PRIMARY KEY ("media_asset_id","tag_id")
+);
+
+-- CreateTable
+CREATE TABLE "companies" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "thumbnail" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "companies_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "documents" (
+    "id" SERIAL NOT NULL,
+    "company_id" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "document_type" VARCHAR(50) NOT NULL,
+    "derived_from" INTEGER,
+    "vector_db_reference_id" VARCHAR(255),
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "documents_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "generator_documents" (
+    "generator_id" INTEGER NOT NULL,
+    "document_id" INTEGER NOT NULL,
+
+    CONSTRAINT "generator_documents_pkey" PRIMARY KEY ("generator_id","document_id")
+);
+
+-- CreateTable
+CREATE TABLE "generators" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "model_type" VARCHAR(50) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "generators_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "mascot_permissions" (
+    "staff_id" INTEGER NOT NULL,
+    "mascot_id" INTEGER NOT NULL,
+    "permission_type_id" INTEGER NOT NULL,
+
+    CONSTRAINT "mascot_permissions_pkey" PRIMARY KEY ("staff_id","mascot_id","permission_type_id")
+);
+
+-- CreateTable
+CREATE TABLE "mascots" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "company_id" INTEGER NOT NULL,
+    "prompt" TEXT,
+    "thumbnail" TEXT,
+    "generator_id" INTEGER,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "mascots_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "media_assets" (
+    "id" SERIAL NOT NULL,
+    "video_id" INTEGER NOT NULL,
+    "asset_type" VARCHAR(50) NOT NULL,
+    "url" VARCHAR(255) NOT NULL,
+    "prompt" TEXT,
+    "thumbnail" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "media_assets_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "permission_types" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+
+    CONSTRAINT "permission_types_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "staff" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "email" VARCHAR(255) NOT NULL,
+    "company_id" INTEGER,
+    "user_id" INTEGER,
+    "is_admin" BOOLEAN NOT NULL DEFAULT false,
+    "thumbnail" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "staff_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "staff_companies" (
+    "staff_id" INTEGER NOT NULL,
+    "company_id" INTEGER NOT NULL,
+
+    CONSTRAINT "staff_companies_pkey" PRIMARY KEY ("staff_id","company_id")
+);
+
+-- CreateTable
+CREATE TABLE "tags" (
+    "id" SERIAL NOT NULL,
+    "text" VARCHAR(255) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "video_permissions" (
+    "staff_id" INTEGER NOT NULL,
+    "mascot_id" INTEGER NOT NULL,
+    "permission_type_id" INTEGER NOT NULL,
+
+    CONSTRAINT "video_permissions_pkey" PRIMARY KEY ("staff_id","mascot_id","permission_type_id")
+);
+
+-- CreateTable
+CREATE TABLE "video_tags" (
+    "video_id" INTEGER NOT NULL,
+    "tag_id" INTEGER NOT NULL,
+
+    CONSTRAINT "video_tags_pkey" PRIMARY KEY ("video_id","tag_id")
+);
+
+-- CreateTable
+CREATE TABLE "videos" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "primary_mascot_id" INTEGER NOT NULL,
+    "prompt" TEXT,
+    "status" VARCHAR(50) NOT NULL,
+    "thumbnail" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "videos_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "email" VARCHAR(255) NOT NULL,
+    "thumbnail" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "api_keys_key_key" ON "api_keys"("key");
+
+-- CreateIndex
+CREATE INDEX "idx_mascots_company_id" ON "mascots"("company_id");
+
+-- CreateIndex
+CREATE INDEX "idx_media_assets_video_id" ON "media_assets"("video_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "permission_types_name_key" ON "permission_types"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "staff_email_key" ON "staff"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "staff_user_id_key" ON "staff"("user_id");
+
+-- CreateIndex
+CREATE INDEX "idx_staff_company_id" ON "staff"("company_id");
+
+-- CreateIndex
+CREATE INDEX "idx_videos_primary_mascot_id" ON "videos"("primary_mascot_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- AddForeignKey
+ALTER TABLE "api_keys" ADD CONSTRAINT "api_keys_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "asset_tags" ADD CONSTRAINT "asset_tags_media_asset_id_fkey" FOREIGN KEY ("media_asset_id") REFERENCES "media_assets"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "asset_tags" ADD CONSTRAINT "asset_tags_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "documents" ADD CONSTRAINT "documents_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "documents" ADD CONSTRAINT "documents_derived_from_fkey" FOREIGN KEY ("derived_from") REFERENCES "documents"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "generator_documents" ADD CONSTRAINT "generator_documents_document_id_fkey" FOREIGN KEY ("document_id") REFERENCES "documents"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "generator_documents" ADD CONSTRAINT "generator_documents_generator_id_fkey" FOREIGN KEY ("generator_id") REFERENCES "generators"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "mascot_permissions" ADD CONSTRAINT "mascot_permissions_mascot_id_fkey" FOREIGN KEY ("mascot_id") REFERENCES "mascots"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "mascot_permissions" ADD CONSTRAINT "mascot_permissions_permission_type_id_fkey" FOREIGN KEY ("permission_type_id") REFERENCES "permission_types"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "mascot_permissions" ADD CONSTRAINT "mascot_permissions_staff_id_fkey" FOREIGN KEY ("staff_id") REFERENCES "staff"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "mascots" ADD CONSTRAINT "mascots_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "mascots" ADD CONSTRAINT "mascots_generator_id_fkey" FOREIGN KEY ("generator_id") REFERENCES "generators"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "media_assets" ADD CONSTRAINT "media_assets_video_id_fkey" FOREIGN KEY ("video_id") REFERENCES "videos"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "staff" ADD CONSTRAINT "staff_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "staff" ADD CONSTRAINT "staff_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "staff_companies" ADD CONSTRAINT "staff_companies_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "staff_companies" ADD CONSTRAINT "staff_companies_staff_id_fkey" FOREIGN KEY ("staff_id") REFERENCES "staff"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "video_permissions" ADD CONSTRAINT "video_permissions_mascot_id_fkey" FOREIGN KEY ("mascot_id") REFERENCES "mascots"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "video_permissions" ADD CONSTRAINT "video_permissions_permission_type_id_fkey" FOREIGN KEY ("permission_type_id") REFERENCES "permission_types"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "video_permissions" ADD CONSTRAINT "video_permissions_staff_id_fkey" FOREIGN KEY ("staff_id") REFERENCES "staff"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "video_tags" ADD CONSTRAINT "video_tags_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "video_tags" ADD CONSTRAINT "video_tags_video_id_fkey" FOREIGN KEY ("video_id") REFERENCES "videos"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "videos" ADD CONSTRAINT "videos_primary_mascot_id_fkey" FOREIGN KEY ("primary_mascot_id") REFERENCES "mascots"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+

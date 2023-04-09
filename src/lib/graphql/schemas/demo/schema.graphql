@@ -1,0 +1,7 @@
+type DemoItem {
+  message: String!
+}
+
+type Query {
+  greetings(input: String!): String!
+}

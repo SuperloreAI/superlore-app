@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model api_keys {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  key        String   @unique @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model asset_tags {
+  media_asset_id Int
+  tag_id         Int
+  media_assets   media_assets @relation(fields: [media_asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tags           tags         @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([media_asset_id, tag_id])
+}
+
+model companies {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  thumbnail       String?
+  created_at      DateTime          @default(now()) @db.Timestamp(6)
+  updated_at      DateTime          @default(now()) @db.Timestamp(6)
+  documents       documents[]
+  mascots         mascots[]
+  staff           staff[]
+  staff_companies staff_companies[]
+}
+
+model documents {
+  id                     Int                   @id @default(autoincrement())
+  company_id             Int
+  content                String
+  document_type          String                @db.VarChar(50)
+  derived_from           Int?
+  vector_db_reference_id String?               @db.VarChar(255)
+  created_at             DateTime              @default(now()) @db.Timestamp(6)
+  updated_at             DateTime              @default(now()) @db.Timestamp(6)
+  companies              companies             @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  documents              documents?            @relation("documentsTodocuments", fields: [derived_from], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_documents        documents[]           @relation("documentsTodocuments")
+  generator_documents    generator_documents[]
+}
+
+model generator_documents {
+  generator_id Int
+  document_id  Int
+  documents    documents  @relation(fields: [document_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  generators   generators @relation(fields: [generator_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([generator_id, document_id])
+}
+
+model generators {
+  id                  Int                   @id @default(autoincrement())
+  name                String                @db.VarChar(255)
+  model_type          String                @db.VarChar(50)
+  created_at          DateTime              @default(now()) @db.Timestamp(6)
+  updated_at          DateTime              @default(now()) @db.Timestamp(6)
+  generator_documents generator_documents[]
+  mascots             mascots[]
+}
+
+model mascot_permissions {
+  staff_id           Int
+  mascot_id          Int
+  permission_type_id Int
+  mascots            mascots          @relation(fields: [mascot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  permission_types   permission_types @relation(fields: [permission_type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  staff              staff            @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([staff_id, mascot_id, permission_type_id])
+}
+
+model mascots {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  company_id         Int
+  prompt             String?
+  thumbnail          String?
+  generator_id       Int?
+  created_at         DateTime             @default(now()) @db.Timestamp(6)
+  updated_at         DateTime             @default(now()) @db.Timestamp(6)
+  mascot_permissions mascot_permissions[]
+  companies          companies            @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  generators         generators?          @relation(fields: [generator_id], references: [id], onUpdate: NoAction)
+  video_permissions  video_permissions[]
+  videos             videos[]
+
+  @@index([company_id], map: "idx_mascots_company_id")
+}
+
+model media_assets {
+  id         Int          @id @default(autoincrement())
+  video_id   Int
+  asset_type String       @db.VarChar(50)
+  url        String       @db.VarChar(255)
+  prompt     String?
+  thumbnail  String?
+  created_at DateTime     @default(now()) @db.Timestamp(6)
+  updated_at DateTime     @default(now()) @db.Timestamp(6)
+  asset_tags asset_tags[]
+  videos     videos       @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([video_id], map: "idx_media_assets_video_id")
+}
+
+model permission_types {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique @db.VarChar(50)
+  mascot_permissions mascot_permissions[]
+  video_permissions  video_permissions[]
+}
+
+model staff {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  email              String               @unique @db.VarChar(255)
+  company_id         Int?
+  user_id            Int?                 @unique
+  is_admin           Boolean              @default(false)
+  thumbnail          String?
+  created_at         DateTime             @default(now()) @db.Timestamp(6)
+  updated_at         DateTime             @default(now()) @db.Timestamp(6)
+  mascot_permissions mascot_permissions[]
+  companies          companies?           @relation(fields: [company_id], references: [id], onUpdate: NoAction)
+  users              users?               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  staff_companies    staff_companies[]
+  video_permissions  video_permissions[]
+
+  @@index([company_id], map: "idx_staff_company_id")
+}
+
+model staff_companies {
+  staff_id   Int
+  company_id Int
+  companies  companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  staff      staff     @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([staff_id, company_id])
+}
+
+model tags {
+  id         Int          @id @default(autoincrement())
+  text       String       @db.VarChar(255)
+  created_at DateTime     @default(now()) @db.Timestamp(6)
+  updated_at DateTime     @default(now()) @db.Timestamp(6)
+  asset_tags asset_tags[]
+  video_tags video_tags[]
+}
+
+model video_permissions {
+  staff_id           Int
+  mascot_id          Int
+  permission_type_id Int
+  mascots            mascots          @relation(fields: [mascot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  permission_types   permission_types @relation(fields: [permission_type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  staff              staff            @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([staff_id, mascot_id, permission_type_id])
+}
+
+model video_tags {
+  video_id Int
+  tag_id   Int
+  tags     tags   @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos   videos @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([video_id, tag_id])
+}
+
+model videos {
+  id                Int            @id @default(autoincrement())
+  name              String         @db.VarChar(255)
+  primary_mascot_id Int
+  prompt            String?
+  status            String         @db.VarChar(50)
+  thumbnail         String?
+  created_at        DateTime       @default(now()) @db.Timestamp(6)
+  updated_at        DateTime       @default(now()) @db.Timestamp(6)
+  media_assets      media_assets[]
+  video_tags        video_tags[]
+  mascots           mascots        @relation(fields: [primary_mascot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([primary_mascot_id], map: "idx_videos_primary_mascot_id")
+}
+
+model users {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(255)
+  email      String     @unique @db.VarChar(255)
+  thumbnail  String?
+  created_at DateTime   @default(now()) @db.Timestamp(6)
+  updated_at DateTime   @default(now()) @db.Timestamp(6)
+  api_keys   api_keys[]
+  staff      staff?
+}

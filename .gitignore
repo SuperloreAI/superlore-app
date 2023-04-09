@@ -33,3 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# service account credentials
+serviceAccountKey.json
+
+# environment variables
+.env

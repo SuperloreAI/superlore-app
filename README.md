@@ -14,3 +14,19 @@ It uses the following technologies:
 $ npm install
 $ npm run dev
 ```
+
+## Seeding Database
+
+1. First connect to Postgres using [Google Cloud Shell](https://console.cloud.google.com/sql/instances/core-db-dev/overview?project=superlore-demo&cloudshell=true).
+
+2. Then [setup Prisma](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/baseline-your-database-typescript-postgres) database types.
+
+```bash
+$ npx prisma
+$ npx prisma init
+$ npx prisma db pull
+$ mkdir -p prisma/migrations/0_init
+$ npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql
+$ npx prisma migrate resolve --applied 0_init
+$ npx prisma generate
+```

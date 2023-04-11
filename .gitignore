@@ -39,3 +39,4 @@ serviceAccountKey.json
 
 # environment variables
 .env
+.npmrc

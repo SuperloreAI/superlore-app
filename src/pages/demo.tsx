@@ -5,6 +5,7 @@ import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useEffect } from "react";
+import { sayHello } from "@superlore/helpers";
 
 interface DemoPageProps {
   message: string;
@@ -16,6 +17,7 @@ const DemoPage: NextPage<DemoPageProps> = ({ message, socketsUri }) => {
   useEffect(() => {
     if (connected) {
       emit("message", "Hello from the client!");
+      sayHello();
     }
   }, [connected, emit]);
 

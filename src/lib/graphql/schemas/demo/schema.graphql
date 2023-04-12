@@ -4,5 +4,4 @@ type DemoItem {
 
 type Query {
   greetings(input: String!): String!
-  salut: Int!
 }

@@ -15,8 +15,6 @@ $ npm install
 $ npm run dev
 ```
 
-When you run `$ npm run generate`, it will require you to modify the files generated at `src/lib/graphql/types/demo/resolvers/Query`. Re-running `npm run generate` has no 
-
 ## Seeding Database
 
 1. First connect to Postgres using [Google Cloud Shell](https://console.cloud.google.com/sql/instances/core-db-dev/overview?project=superlore-demo&cloudshell=true).

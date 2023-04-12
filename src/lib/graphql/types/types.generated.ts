@@ -22,6 +22,7 @@ export type DemoItem = {
 export type Query = {
   __typename: 'Query';
   greetings: Scalars['String'];
+  salut: Scalars['Int'];
 };
 
 
@@ -103,6 +104,7 @@ export type ResolversTypes = {
   DemoItem: ResolverTypeWrapper<DemoItem>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Query: ResolverTypeWrapper<{}>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
@@ -111,6 +113,7 @@ export type ResolversParentTypes = {
   DemoItem: DemoItem;
   String: Scalars['String'];
   Query: {};
+  Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
 };
 
@@ -121,6 +124,7 @@ export type DemoItemResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   greetings?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryGreetingsArgs, 'input'>>;
+  salut?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {

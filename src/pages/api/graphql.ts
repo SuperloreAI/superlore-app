@@ -2,8 +2,9 @@
 import { createYoga, createSchema } from "graphql-yoga";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { typeDefs } from "@/lib/graphql/types/typeDefs.generated";
+import { RootResolvers } from "@/lib/graphql/resolvers";
 
-interface CustomContext {
+export interface CustomContext {
   req: NextApiRequest;
   res: NextApiResponse<any>;
 }
@@ -15,20 +16,9 @@ export const config = {
   },
 };
 
-const resolvers = {
-  Query: {
-    greetings: (
-      _parent: any,
-      args: { input: string },
-      _context: CustomContext,
-      _info: any
-    ) => `Greetings! You said ${args.input}`,
-  },
-};
-
 const schema = createSchema<CustomContext>({
   typeDefs,
-  resolvers,
+  resolvers: RootResolvers,
 });
 
 export default createYoga<CustomContext>({

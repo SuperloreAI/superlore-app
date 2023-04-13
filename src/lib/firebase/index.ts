@@ -18,4 +18,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+if (window) {
+  const analytics = getAnalytics(app);
+}
+
+console.log("---- firebase app");
+console.log(app);

@@ -1,5 +1,9 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
-import { projectId, postgresDevSecret } from "@/lib/constants";
+import {
+  projectId,
+  postgresDevSecret,
+  firebaseConfigSecret,
+} from "@/lib/constants";
 
 async function accessSecretVersion(
   projectId: string,
@@ -38,4 +42,22 @@ export const getPostgresPassword = (): Promise<SecretKey> => {
   // .catch((error) => {
   //   console.error(`Error accessing secret: ${error}`);
   // });
+};
+
+export interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+}
+export const getFirebaseConfig = async () => {
+  const firebaseConfig = await accessSecretVersion(
+    projectId,
+    firebaseConfigSecret.secretId,
+    firebaseConfigSecret.versionId
+  );
+  return JSON.parse(firebaseConfig) as FirebaseConfig;
 };

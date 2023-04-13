@@ -5,3 +5,8 @@ export const postgresDevSecret = {
   secretId: "postgres-dev-db-password",
   versionId: "latest",
 };
+
+export const firebaseConfigSecret = {
+  secretId: "FirebaseConfig",
+  versionId: "latest",
+};

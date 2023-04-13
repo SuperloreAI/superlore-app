@@ -15,7 +15,11 @@ async function accessSecretVersion(
     process.env.GCP_KEYFILE_BASE64 || "",
     "base64"
   ).toString("utf-8");
+  console.log(`base64KeyFile`);
+  console.log(base64KeyFile);
   const credentials = JSON.parse(base64KeyFile);
+  console.log(`credentials`);
+  console.log(credentials);
   const client = new SecretManagerServiceClient({
     // Option 1: path to service account keyfile
     // keyFilename: pathToKeyFile,

@@ -11,12 +11,16 @@ async function accessSecretVersion(
   versionId: string
 ): Promise<string> {
   // path to repo working directory
-  const repoWorkingDir = process.cwd();
-  const pathToKeyFile = `${repoWorkingDir}/serviceAccountKey.json`;
-  console.log(`path to key file = ${pathToKeyFile}`);
+  const base64KeyFile = Buffer.from(
+    process.env.GCP_KEYFILE_BASE64 || "",
+    "base64"
+  ).toString("utf-8");
+  const credentials = JSON.parse(base64KeyFile);
   const client = new SecretManagerServiceClient({
-    // path to service account keyfile
-    keyFilename: pathToKeyFile,
+    // Option 1: path to service account keyfile
+    // keyFilename: pathToKeyFile,
+    // Option 2: stringified service account as .ENV variable
+    ...credentials,
   });
   const name = `projects/${projectId}/secrets/${secretId}/versions/${versionId}`;
   const [response] = await client.accessSecretVersion({ name });

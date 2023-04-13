@@ -34,7 +34,7 @@ function useFirebase(firebaseConfig: FirebaseConfig): FirebaseState {
     };
 
     initFirebase();
-  }, []);
+  }, [firebaseConfig]);
 
   return { user, loading, auth };
 }

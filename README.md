@@ -34,6 +34,7 @@ $ npx prisma generate
 ## Setting up ENV variables
 
 To get GCP to work, you will need to:
+[related](https://github.com/orgs/vercel/discussions/219#discussioncomment-128702)
 
 ```js
 const GCP_service_account_key = {

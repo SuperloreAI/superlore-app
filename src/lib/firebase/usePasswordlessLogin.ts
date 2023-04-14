@@ -12,7 +12,15 @@ import {
 
 type PasswordlessEmailLoginStatus = "idle" | "sending" | "sent" | "error";
 
-export const usePasswordlessEmailLogin = (firebaseConfig: FirebaseConfig) => {
+interface Props {
+  firebaseConfig: FirebaseConfig;
+  completeLoginRoute: string;
+}
+
+export const usePasswordlessEmailLogin = ({
+  firebaseConfig,
+  completeLoginRoute,
+}: Props) => {
   const { auth } = useFirebase(firebaseConfig);
   const [status, setStatus] = useState<PasswordlessEmailLoginStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
@@ -20,9 +28,15 @@ export const usePasswordlessEmailLogin = (firebaseConfig: FirebaseConfig) => {
   const sendSignInLink = useCallback(
     async (email: string) => {
       setStatus("sending");
-
+      console.log(`completeLoginRoute = ${completeLoginRoute}`);
+      if (!completeLoginRoute) {
+        setError(
+          new Error("Nothing found in process.env.CONFIRM_LOGIN_ENDPOINT;")
+        );
+        return;
+      }
       const actionCodeSettings = {
-        url: "http://localhost:3000/complete-login", // Replace with your desired redirect URL
+        url: completeLoginRoute, // Replace with your desired redirect URL
         handleCodeInApp: true,
       };
 
@@ -35,7 +49,7 @@ export const usePasswordlessEmailLogin = (firebaseConfig: FirebaseConfig) => {
         setStatus("error");
       }
     },
-    [auth]
+    [auth, completeLoginRoute]
   );
 
   const signInWithLink = useCallback(
@@ -52,36 +66,38 @@ export const usePasswordlessEmailLogin = (firebaseConfig: FirebaseConfig) => {
     [auth]
   );
 
-  const handleEmailLink = useCallback(
-    async (emailLink: string) => {
-      let email = window.localStorage.getItem("emailForSignIn");
-      if (!email) {
-        email = prompt("Please provide your email for confirmation");
+  const handleEmailLink = async (emailLink: string, email: string) => {
+    try {
+      const storedEmail = window.localStorage.getItem("emailForSignIn");
+      const userEmail = email || storedEmail;
+
+      if (!userEmail) {
+        throw new Error("Email not provided or found in local storage.");
       }
 
-      if (email && isSignInWithEmailLink(auth, emailLink)) {
-        const methods = await fetchSignInMethodsForEmail(auth, email);
-        if (methods.length === 0) {
-          // User is not registered, sign in with email link
-          await signInWithLink(email, emailLink);
+      const methods = await fetchSignInMethodsForEmail(auth, userEmail);
+      if (methods.length === 0) {
+        // User not found, create a new user with email link
+        await signInWithEmailLink(auth, userEmail, emailLink);
+      } else {
+        // User found, link email link to the existing user
+        if (auth.currentUser) {
+          const credential = EmailAuthProvider.credentialWithLink(
+            userEmail,
+            emailLink
+          );
+          await linkWithCredential(auth.currentUser, credential);
         } else {
-          // User is registered, link email link to the user
-          const currentUser = auth.currentUser;
-          if (currentUser) {
-            const credential = EmailAuthProvider.credentialWithLink(
-              email,
-              emailLink
-            );
-            await linkWithCredential(currentUser, credential);
-          } else {
-            throw new Error("No current user to link the email link to.");
-          }
+          await signInWithEmailLink(auth, userEmail, emailLink);
         }
-        window.localStorage.removeItem("emailForSignIn");
       }
-    },
-    [auth, signInWithLink]
-  );
+
+      window.localStorage.removeItem("emailForSignIn");
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    }
+  };
 
   return { status, error, sendSignInLink, signInWithLink, handleEmailLink };
 };

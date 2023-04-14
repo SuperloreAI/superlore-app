@@ -4,11 +4,14 @@ import React, { useState } from "react";
 
 interface Props {
   firebaseConfig: FirebaseConfig;
+  completeLoginRoute: string;
 }
 
-const Login: React.FC<Props> = ({ firebaseConfig }) => {
-  const { sendSignInLink, status, error } =
-    usePasswordlessEmailLogin(firebaseConfig);
+const Login: React.FC<Props> = ({ firebaseConfig, completeLoginRoute }) => {
+  const { sendSignInLink, status, error } = usePasswordlessEmailLogin({
+    firebaseConfig,
+    completeLoginRoute,
+  });
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -88,9 +91,11 @@ const Login: React.FC<Props> = ({ firebaseConfig }) => {
 
 export const getServerSideProps = async () => {
   const firebaseConfig = await getFirebaseConfig();
+  const completeLoginRoute = process.env.CONFIRM_LOGIN_ENDPOINT;
   return {
     props: {
       firebaseConfig,
+      completeLoginRoute,
     },
   };
 };

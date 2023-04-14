@@ -19,7 +19,7 @@ export default function Home({ firebaseConfig }: HomeProps) {
   // Redirect unauthenticated users to the login page
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.push("/auth/login");
     }
   }, [loading, user, router]);
   return (

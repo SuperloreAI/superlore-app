@@ -1,4 +1,5 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { GoogleAuth } from "google-auth-library";
 import {
   projectId,
   postgresDevSecret,
@@ -15,16 +16,16 @@ async function accessSecretVersion(
     process.env.GCP_KEYFILE_BASE64 || "",
     "base64"
   ).toString("utf-8");
-  console.log(`base64KeyFile`);
-  console.log(base64KeyFile);
   const credentials = JSON.parse(base64KeyFile);
-  console.log(`credentials`);
-  console.log(credentials);
+  // Create a GoogleAuth instance with the credentials
+  const auth = new GoogleAuth({
+    credentials,
+  });
   const client = new SecretManagerServiceClient({
     // Option 1: path to service account keyfile
     // keyFilename: pathToKeyFile,
     // Option 2: stringified service account as .ENV variable
-    ...credentials,
+    auth,
   });
   const name = `projects/${projectId}/secrets/${secretId}/versions/${versionId}`;
   const [response] = await client.accessSecretVersion({ name });

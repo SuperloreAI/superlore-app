@@ -28,7 +28,7 @@ const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({
           </label>
           <input
             className="text-xl font-semibold mb-4 w-full"
-            value={`Scene #N`}
+            defaultValue={`Scene #N`}
           />
           <textarea
             className="w-full p-2 border border-gray-300 rounded resize-none"

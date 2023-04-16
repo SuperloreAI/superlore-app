@@ -75,11 +75,11 @@ export const getServerSideProps = async () => {
     },
   });
 
-  const { greetings } = data;
+  // const { greetings } = data;
 
   return {
     props: {
-      message: greetings,
+      message: "greetings",
       // socketsUri: WEBSOCKETS_ENDPOINT,
     },
   };

@@ -14,9 +14,9 @@ interface GuardedDemoPageProps {
   firebaseConfig: FirebaseConfig;
 }
 
-const GuardedDemoPage: NextPage<GuardedDemoPageProps> = ({
+export default function GuardedDemoPage({
   firebaseConfig,
-}) => {
+}: GuardedDemoPageProps) {
   console.log(`firebaseConfig`);
   console.log(firebaseConfig);
   const router = useRouter();
@@ -39,7 +39,7 @@ const GuardedDemoPage: NextPage<GuardedDemoPageProps> = ({
       </p> */}
     </>
   );
-};
+}
 
 export const getStaticProps = async () => {
   const firebaseConfig = await getFirebaseConfig();
@@ -49,5 +49,3 @@ export const getStaticProps = async () => {
     },
   };
 };
-
-export default GuardedDemoPage;

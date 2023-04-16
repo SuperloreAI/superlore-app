@@ -10,6 +10,8 @@ It uses the following technologies:
 
 ## Getting Started
 
+Make sure you are using node 16+
+
 ```bash
 $ npm install
 $ npm run dev

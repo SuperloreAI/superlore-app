@@ -53,7 +53,7 @@ const TemplatePage: NextPage<TemplatePageProps> = ({
   );
 };
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
   // const WEBSOCKETS_ENDPOINT = process.env.WEBSOCKETS_ENDPOINT;
   const client = new ApolloClient({

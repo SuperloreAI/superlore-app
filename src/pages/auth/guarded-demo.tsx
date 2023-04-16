@@ -41,7 +41,7 @@ export default function GuardedDemoPage({
   );
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   const firebaseConfig = await getFirebaseConfig();
   return {
     props: {

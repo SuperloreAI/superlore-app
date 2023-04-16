@@ -38,7 +38,7 @@ const CanvasPage: NextPage<CanvasPageProps> = ({ message }) => {
   );
 };
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
   const client = new ApolloClient({
     uri: GRAPHQL_ENDPOINT,

@@ -3,18 +3,11 @@ import React, { useRef, useEffect, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js";
 import "tailwindcss/tailwind.css";
+import { formatTime } from "@/lib/helpers/time";
 
 interface AudioRangerProps {
   audioURL: string;
 }
-
-const formatTime = (time: number) => {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
-};
 
 const parseTime = (time: string) => {
   const timeParts = time.split(":");

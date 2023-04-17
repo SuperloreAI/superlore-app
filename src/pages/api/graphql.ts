@@ -27,10 +27,13 @@ const resolvers = {
   Mutation: {
     createMascot: (
       _parent: any,
-      args: { input: string },
+      args: { name: string },
       _context: CustomContext,
       _info: any
-    ) => `mascotID`,
+    ) => ({
+      id: "DemoMascot",
+      name: args.name,
+    }),
   },
 };
 

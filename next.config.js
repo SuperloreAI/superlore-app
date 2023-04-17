@@ -19,6 +19,7 @@ const nextConfig = {
       "/auth/guarded-demo": {
         page: "/auth/guarded-demo",
       },
+      "/mascot/create-mascot": { page: "/mascot/create-mascot" },
     };
   },
 };

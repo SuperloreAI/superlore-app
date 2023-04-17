@@ -1,20 +1,19 @@
-import { Query, QueryGreetingsArgs } from "@/lib/graphql/types/types.generated";
-import useSocket from "@/lib/hooks/websockets";
-import { WebSocketsURI } from "@/lib/types/base.types";
-import { ApolloClient, gql, InMemoryCache, useMutation } from "@apollo/client";
+import {
+  Mascot,
+  Mutation,
+  MutationCreateMascotArgs,
+} from "@/lib/graphql/types/types.generated";
+import { gql, useMutation } from "@apollo/client";
 import { NextPage } from "next";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { sayHello } from "@superlore/helpers";
+import { useState } from "react";
 import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 import { useApolloClient } from "@/lib/graphql/ApolloProvider";
-import { UniversalProvider } from "@/lib/universal-provider";
 import {
   UniversalGetServerSideProps,
   UniversalServerSidePropsInterface,
 } from "@/lib/universal-server-props";
 import { withUniversalProvider } from "@/lib/with-universal-provider";
-import { FirebaseConfig } from "@/lib/secrets/secrets";
 
 interface CreateMascotProps extends UniversalServerSidePropsInterface {}
 
@@ -30,24 +29,24 @@ const CREATE_MASCOT_MUTATION = gql`
 const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
   const apolloClient = useApolloClient();
   console.log(firebaseConfig);
-  // const { user, loading } = useFirebase();
+  const { user, loading } = useFirebase();
 
   const [name, setName] = useState("");
-  // const [createMascot] = useMutation(CREATE_MASCOT_MUTATION);
+  const [createMascot] = useMutation<Mutation, MutationCreateMascotArgs>(
+    CREATE_MASCOT_MUTATION
+  );
 
-  console.log(`apolloClient`);
-  console.log(apolloClient);
-
-  // console.log(`user`);
-  // console.log(user?.email);
+  const [infoAboutMascot, setInfoAboutMascot] = useState<Mascot>();
 
   const handleCreateMascot = async () => {
-    // try {
-    //   // const { data } = await createMascot({ variables: { name } });
-    //   // console.log("Mascot created:", data.createMascot);
-    // } catch (error) {
-    //   console.error("Error creating mascot:", error);
-    // }
+    try {
+      const { data } = await createMascot({ variables: { name } });
+      if (data) {
+        setInfoAboutMascot(data.createMascot);
+      }
+    } catch (error) {
+      console.error("Error creating mascot:", error);
+    }
   };
 
   return (
@@ -78,6 +77,7 @@ const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
           </button>
         </div>
       </div>
+      <p>{JSON.stringify(infoAboutMascot)}</p>
     </div>
   );
 };

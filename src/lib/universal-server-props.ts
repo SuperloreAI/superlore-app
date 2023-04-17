@@ -6,9 +6,11 @@ export interface UniversalServerSidePropsInterface {
 export const UniversalGetServerSideProps = async () => {
   // https://stackoverflow.com/a/72325973
   const firebaseConfig = await getFirebaseConfig();
+  const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT;
   return {
     props: {
       firebaseConfig,
+      graphqlEndpoint,
     },
   };
 

@@ -5,6 +5,7 @@ import { FirebaseConfig } from "@/lib/secrets/secrets";
 
 interface WithUniversalProviderOptions {
   firebaseConfig: FirebaseConfig;
+  graphqlEndpoint: string;
 }
 
 export function withUniversalProvider<P extends object>(
@@ -14,9 +15,12 @@ export function withUniversalProvider<P extends object>(
   const WithUniversalProvider: NextPage<
     P & Partial<WithUniversalProviderOptions>
   > = (props) => {
-    if (!props.firebaseConfig) return null;
+    if (!props.firebaseConfig || !props.graphqlEndpoint) return null;
     return (
-      <UniversalProvider firebaseConfig={props.firebaseConfig}>
+      <UniversalProvider
+        firebaseConfig={props.firebaseConfig}
+        graphqlEndpoint={props.graphqlEndpoint}
+      >
         <WrappedComponent {...props} />
       </UniversalProvider>
     );

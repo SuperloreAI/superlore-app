@@ -7,15 +7,19 @@ import { FirebaseProvider } from "@/lib/firebase/FirebaseProvider";
 interface UniversalProviderProps {
   children: ReactNode;
   firebaseConfig: FirebaseConfig;
+  graphqlEndpoint: string;
 }
 
 export const UniversalProvider: React.FC<UniversalProviderProps> = ({
   children,
   firebaseConfig,
+  graphqlEndpoint,
 }) => {
   return (
     <FirebaseProvider firebaseConfig={firebaseConfig}>
-      <ApolloProvider>{children}</ApolloProvider>
+      <ApolloProvider graphqlEndpoint={graphqlEndpoint}>
+        {children}
+      </ApolloProvider>
     </FirebaseProvider>
   );
 };

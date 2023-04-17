@@ -1,24 +1,52 @@
-import { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from "react";
 import {
   ApolloClient,
   InMemoryCache,
   createHttpLink,
   NormalizedCacheObject,
+  ApolloProvider as ApolloProviderBase,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { FirebaseConfig } from "@/lib/secrets/secrets";
-import useFirebase from "@/lib/firebase/useFirebase";
+import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 
-interface useApolloProps {
-  firebaseConfig: FirebaseConfig;
+interface useApolloProviderProps {
+  children: ReactNode;
 }
-const useApollo = ({
-  firebaseConfig,
-}: useApolloProps): ApolloClient<NormalizedCacheObject> | null => {
+
+const ApolloClientContext =
+  createContext<ApolloClient<NormalizedCacheObject> | null>(null);
+
+const ApolloProvider: React.FC<useApolloProviderProps> = ({ children }) => {
+  const client = useApollo();
+
+  if (!client) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <ApolloProviderBase client={client}>
+      <ApolloClientContext.Provider value={client}>
+        {children}
+      </ApolloClientContext.Provider>
+    </ApolloProviderBase>
+  );
+};
+
+const useApolloClient = (): ApolloClient<NormalizedCacheObject> | null => {
+  return useContext(ApolloClientContext);
+};
+
+const useApollo = (): ApolloClient<NormalizedCacheObject> | null => {
   const [client, setClient] =
     useState<ApolloClient<NormalizedCacheObject> | null>(null);
-
-  const { auth } = useFirebase(firebaseConfig);
+  const { auth } = useFirebase();
 
   useEffect(() => {
     const setApolloClient = async () => {
@@ -54,4 +82,4 @@ const useApollo = ({
   return client;
 };
 
-export default useApollo;
+export { ApolloProvider, useApolloClient };

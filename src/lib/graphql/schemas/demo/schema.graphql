@@ -2,6 +2,16 @@ type DemoItem {
   message: String!
 }
 
+type Mascot {
+  id: String!
+  name: String!
+}
+
 type Query {
   greetings(input: String!): String!
 }
+
+type Mutation {
+  createMascot(name: String!): Mascot!
+}
+

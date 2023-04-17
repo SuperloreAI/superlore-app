@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { FirebaseConfig } from "@/lib/secrets/secrets";
-import useFirebase from "@/lib/firebase/useFirebase";
+import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 import {
   EmailAuthProvider,
   fetchSignInMethodsForEmail,
@@ -21,7 +21,7 @@ export const usePasswordlessEmailLogin = ({
   firebaseConfig,
   completeLoginRoute,
 }: Props) => {
-  const { auth } = useFirebase(firebaseConfig);
+  const { auth } = useFirebase();
   const [status, setStatus] = useState<PasswordlessEmailLoginStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
 

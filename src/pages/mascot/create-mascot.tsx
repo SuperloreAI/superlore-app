@@ -1,51 +1,55 @@
 import { Query, QueryGreetingsArgs } from "@/lib/graphql/types/types.generated";
 import useSocket from "@/lib/hooks/websockets";
 import { WebSocketsURI } from "@/lib/types/base.types";
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+import { ApolloClient, gql, InMemoryCache, useMutation } from "@apollo/client";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { sayHello } from "@superlore/helpers";
-import useFirebase from "@/lib/firebase/useFirebase";
-import { FirebaseConfig, getFirebaseConfig } from "@/lib/secrets/secrets";
-import useApollo from "@/lib/graphql/useApollo";
+import { useFirebase } from "@/lib/firebase/FirebaseProvider";
+import { useApolloClient } from "@/lib/graphql/ApolloProvider";
+import { UniversalProvider } from "@/lib/universal-provider";
+import {
+  UniversalGetServerSideProps,
+  UniversalServerSidePropsInterface,
+} from "@/lib/universal-server-props";
+import { withUniversalProvider } from "@/lib/with-universal-provider";
+import { FirebaseConfig } from "@/lib/secrets/secrets";
 
-interface CreateMascotProps {
-  firebaseConfig: FirebaseConfig;
-}
+interface CreateMascotProps extends UniversalServerSidePropsInterface {}
+
+const CREATE_MASCOT_MUTATION = gql`
+  mutation CreateMascot($name: String!) {
+    createMascot(name: $name) {
+      id
+      name
+    }
+  }
+`;
 
 const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
-  const apolloClient = useApollo({ firebaseConfig });
-  const { user, loading } = useFirebase(firebaseConfig);
+  const apolloClient = useApolloClient();
+  console.log(firebaseConfig);
+  // const { user, loading } = useFirebase();
 
   const [name, setName] = useState("");
+  // const [createMascot] = useMutation(CREATE_MASCOT_MUTATION);
 
   console.log(`apolloClient`);
   console.log(apolloClient);
 
-  console.log(`user`);
-  console.log(user?.email);
+  // console.log(`user`);
+  // console.log(user?.email);
 
-  // useEffect(() => {
-  //   if (connected) {
-  //     emit("message", "Hello from the client!");
-  //     sayHello();
-  //   }
-  // }, [connected, emit]);
+  const handleCreateMascot = async () => {
+    // try {
+    //   // const { data } = await createMascot({ variables: { name } });
+    //   // console.log("Mascot created:", data.createMascot);
+    // } catch (error) {
+    //   console.error("Error creating mascot:", error);
+    // }
+  };
 
-  // useEffect(() => {
-  //   on("message", (message) => {
-  //     console.log("Received message:", message);
-  //   });
-
-  //   return () => {
-  //     on("message", () => {});
-  //   };
-  // }, [on]);
-
-  // if (error) {
-  //   return <div>Error connecting to the server: {error.message}</div>;
-  // }
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
@@ -68,7 +72,7 @@ const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
           />
           <button
             className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-            onClick={() => console.log("Create Mascot")}
+            onClick={handleCreateMascot}
           >
             Create Mascot
           </button>
@@ -79,12 +83,12 @@ const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
 };
 
 export const getServerSideProps = async () => {
-  const firebaseConfig = await getFirebaseConfig();
+  const universalServerProps = await UniversalGetServerSideProps();
   return {
     props: {
-      firebaseConfig,
+      ...universalServerProps.props,
     },
   };
 };
 
-export default CreateMascot;
+export default withUniversalProvider(CreateMascot);

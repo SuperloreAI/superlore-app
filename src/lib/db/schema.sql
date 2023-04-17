@@ -80,7 +80,30 @@ CREATE TABLE generator_documents (
     FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
 );
 
+-- Create the shared_access table
+CREATE TABLE shared_access (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    shared_with_user_id INTEGER NOT NULL,
+    mascot_id INTEGER,
+    generator_id INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (shared_with_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (mascot_id) REFERENCES mascots(id) ON DELETE CASCADE,
+    FOREIGN KEY (generator_id) REFERENCES generators(id) ON DELETE CASCADE,
+    CHECK ((mascot_id IS NOT NULL AND generator_id IS NULL) OR (mascot_id IS NULL AND generator_id IS NOT NULL))
+);
+
+
 -- Add indexes for frequently accessed data
 CREATE INDEX idx_videos_primary_mascot_id ON videos (primary_mascot_id);
 CREATE INDEX idx_media_assets_video_id ON media_assets (video_id);
 CREATE INDEX idx_mascots_user_id ON mascots (user_id);
+
+-- Add indexes for frequently accessed data
+CREATE INDEX idx_shared_access_user_id ON shared_access (user_id);
+CREATE INDEX idx_shared_access_shared_with_user_id ON shared_access (shared_with_user_id);
+CREATE INDEX idx_shared_access_mascot_id ON shared_access (mascot_id);
+CREATE INDEX idx_shared_access_generator_id ON shared_access (generator_id);

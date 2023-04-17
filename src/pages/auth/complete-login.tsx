@@ -1,5 +1,7 @@
 import { usePasswordlessEmailLogin } from "@/lib/firebase/usePasswordlessLogin";
 import { FirebaseConfig, getFirebaseConfig } from "@/lib/secrets/secrets";
+import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
+import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
@@ -95,14 +97,14 @@ const CompleteLogin: React.FC<Props> = ({
 };
 
 export const getServerSideProps = async () => {
-  const firebaseConfig = await getFirebaseConfig();
+  const universalServerProps = await UniversalGetServerSideProps();
   const completeLoginRoute = process.env.CONFIRM_LOGIN_ENDPOINT;
   return {
     props: {
-      firebaseConfig,
+      ...universalServerProps.props,
       completeLoginRoute,
     },
   };
 };
 
-export default CompleteLogin;
+export default withUniversalProvider(CompleteLogin);

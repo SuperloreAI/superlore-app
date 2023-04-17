@@ -12,8 +12,8 @@ import { useApolloClient } from "@/lib/graphql/ApolloProvider";
 import {
   UniversalGetServerSideProps,
   UniversalServerSidePropsInterface,
-} from "@/lib/universal-server-props";
-import { withUniversalProvider } from "@/lib/with-universal-provider";
+} from "@/lib/universal-provider/universal-server-props";
+import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 
 interface CreateMascotProps extends UniversalServerSidePropsInterface {}
 

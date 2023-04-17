@@ -4,8 +4,8 @@ import { WebSocketsURI } from "@/lib/types/base.types";
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import { NextPage } from "next";
 import Link from "next/link";
-import { useEffect } from "react";
-import { sayHello } from "@superlore/helpers";
+import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
+import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 
 interface TemplatePageProps {
   message: string;
@@ -54,6 +54,7 @@ const TemplatePage: NextPage<TemplatePageProps> = ({
 };
 
 export const getServerSideProps = async () => {
+  const universalServerProps = await UniversalGetServerSideProps();
   const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
   // const WEBSOCKETS_ENDPOINT = process.env.WEBSOCKETS_ENDPOINT;
   const client = new ApolloClient({
@@ -79,10 +80,11 @@ export const getServerSideProps = async () => {
 
   return {
     props: {
+      ...universalServerProps.props,
       message: greetings,
       // socketsUri: WEBSOCKETS_ENDPOINT,
     },
   };
 };
 
-export default TemplatePage;
+export default withUniversalProvider(TemplatePage);

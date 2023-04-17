@@ -1,6 +1,6 @@
 // lib/withUniversalProvider.tsx
 import { NextPage } from "next";
-import { UniversalProvider } from "@/lib/universal-provider";
+import { UniversalProvider } from "@/lib/universal-provider/UniversalProvider";
 import { FirebaseConfig } from "@/lib/secrets/secrets";
 
 interface WithUniversalProviderOptions {

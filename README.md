@@ -63,3 +63,20 @@ GCP_KEYFILE_BASE64=eyJ0eXBlIjoi....291bnQuY29tIn0=
 To get this available in Vercel deployment, manually copy the env variables into the deployment tab `Project > Settings > Environment Variables`
 
 Be sure to also add `NPM_TOKEN` as an env variable in Vercel. The token is found locally at `.npmrc`
+
+## User Flow MVP
+
+1. Scrollshow of interesting TikToks
+2. Sign up for account --> email passwordless
+3. Add money to account
+4. Video Canvas page with preloaded models
+5. LLM asks what kind of video the user wants to make. User responds with prompt.
+6. LLM generates scene by scene descriptions for video.
+7. User modifies as they wish. Click the "generate" button to turn text-to-video
+8. User may also insert a video from their library into the editor
+
+## Video to Video style transfer
+
+1. Upload a video you want to convert
+2. Select timeframe crop and add to canvas
+3. Add prompt to timecrop and click "generate"

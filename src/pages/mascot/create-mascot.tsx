@@ -14,6 +14,7 @@ import {
   UniversalServerSidePropsInterface,
 } from "@/lib/universal-provider/universal-server-props";
 import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
+import VideoUploader from "@/components/VideoUploader";
 
 interface CreateMascotProps extends UniversalServerSidePropsInterface {}
 
@@ -78,6 +79,7 @@ const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
         </div>
       </div>
       <p>{JSON.stringify(infoAboutMascot)}</p>
+      <VideoUploader />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
 import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
+import VideoUploader from "@/components/VideoUploader";
 
 interface GuardedDemoPageProps {
   firebaseConfig: FirebaseConfig;
@@ -25,6 +26,8 @@ const GuardedDemoPage = ({ firebaseConfig }: GuardedDemoPageProps) => {
       <h1>Demo Guarded Page</h1>
       <p>You must be logged in to see this page</p>
       <button>Go Home</button>
+
+      <VideoUploader />
       {/* <p>
         {connected
           ? "Connected to the websockets server"

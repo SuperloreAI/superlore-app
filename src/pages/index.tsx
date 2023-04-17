@@ -1,10 +1,12 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
+import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+const Home = () => {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -114,4 +116,15 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};
+
+export const getServerSideProps = async () => {
+  const universalServerProps = await UniversalGetServerSideProps();
+  return {
+    props: {
+      ...universalServerProps.props,
+    },
+  };
+};
+
+export default withUniversalProvider(Home);

@@ -1,15 +1,15 @@
-import useFirebase from "@/lib/firebase/useFirebase";
+import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 import { FirebaseConfig, getFirebaseConfig } from "@/lib/secrets/secrets";
+import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
+import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-interface Props {
-  firebaseConfig: FirebaseConfig;
-}
+interface Props {}
 
-const Logout: React.FC<Props> = ({ firebaseConfig }) => {
+const Logout: React.FC<Props> = () => {
   const router = useRouter();
-  const { auth } = useFirebase(firebaseConfig);
+  const { auth } = useFirebase();
   useEffect(() => {
     if (!auth) {
       console.log("No auth loaded yet");
@@ -34,12 +34,12 @@ const Logout: React.FC<Props> = ({ firebaseConfig }) => {
 };
 
 export const getServerSideProps = async () => {
-  const firebaseConfig = await getFirebaseConfig();
+  const universalServerProps = await UniversalGetServerSideProps();
   return {
     props: {
-      firebaseConfig,
+      ...universalServerProps.props,
     },
   };
 };
 
-export default Logout;
+export default withUniversalProvider(Logout);

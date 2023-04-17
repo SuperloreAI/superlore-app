@@ -28,7 +28,7 @@ const ApolloProvider: React.FC<useApolloProviderProps> = ({
   graphqlEndpoint,
 }) => {
   const client = useApollo({ graphqlEndpoint });
-
+  console.log(client);
   if (!client) {
     return <div>Loading...</div>;
   }
@@ -58,7 +58,6 @@ const useApollo = ({
 
   useEffect(() => {
     const setApolloClient = async () => {
-      if (!auth || !auth.currentUser) return;
       setGqlEndpoint(graphqlEndpoint);
       const userTokenID = await auth.currentUser?.getIdToken();
       const GRAPHQL_ENDPOINT = graphqlEndpoint;
@@ -78,9 +77,11 @@ const useApollo = ({
         };
       });
 
+      const linkage = auth && auth.currentUser ? authLink.concat(link) : link;
+
       const apolloClient = new ApolloClient<NormalizedCacheObject>({
         cache: new InMemoryCache(),
-        link: authLink.concat(link),
+        link: linkage,
       });
 
       setClient(apolloClient);

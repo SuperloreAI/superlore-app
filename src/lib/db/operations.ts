@@ -30,3 +30,18 @@ export async function addStaffMember(
   const values = [name, email, companyId, isAdmin, thumbnail];
   await pool.query(query, values);
 }
+
+export async function createMascot(name: string): Promise<void> {
+  const { pool } = getPool();
+  // const mascotInfo = {
+  //   name,
+  //   user_id,
+  //   prompt,
+  //   thumbnail,
+  //   generator_id,
+  // }
+  const query = "INSERT INTO companies (name) VALUES ($1)";
+  const values = [name];
+  const res = await pool.query(query, values);
+  const fields = res.fields;
+}

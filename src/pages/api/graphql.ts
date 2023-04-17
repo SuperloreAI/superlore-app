@@ -24,6 +24,17 @@ const resolvers = {
       _info: any
     ) => `Greetings! You said ${args.input}`,
   },
+  Mutation: {
+    createMascot: (
+      _parent: any,
+      args: { name: string },
+      _context: CustomContext,
+      _info: any
+    ) => ({
+      id: "DemoMascot",
+      name: args.name,
+    }),
+  },
 };
 
 const schema = createSchema<CustomContext>({

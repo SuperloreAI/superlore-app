@@ -19,6 +19,22 @@ export type DemoItem = {
   message: Scalars['String'];
 };
 
+export type Mascot = {
+  __typename: 'Mascot';
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type Mutation = {
+  __typename: 'Mutation';
+  createMascot: Mascot;
+};
+
+
+export type MutationCreateMascotArgs = {
+  name: Scalars['String'];
+};
+
 export type Query = {
   __typename: 'Query';
   greetings: Scalars['String'];
@@ -102,6 +118,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   DemoItem: ResolverTypeWrapper<DemoItem>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Mascot: ResolverTypeWrapper<Mascot>;
+  Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
@@ -110,6 +128,8 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   DemoItem: DemoItem;
   String: Scalars['String'];
+  Mascot: Mascot;
+  Mutation: {};
   Query: {};
   Boolean: Scalars['Boolean'];
 };
@@ -119,12 +139,24 @@ export type DemoItemResolvers<ContextType = any, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MascotResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mascot'] = ResolversParentTypes['Mascot']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   greetings?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryGreetingsArgs, 'input'>>;
 };
 
 export type Resolvers<ContextType = any> = {
   DemoItem?: DemoItemResolvers<ContextType>;
+  Mascot?: MascotResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };
 

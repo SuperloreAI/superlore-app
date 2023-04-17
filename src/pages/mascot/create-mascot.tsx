@@ -7,6 +7,7 @@ import { gql, useMutation } from "@apollo/client";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useFirebase } from "@/lib/firebase/FirebaseProvider";
 import { useApolloClient } from "@/lib/graphql/ApolloProvider";
 import {
@@ -15,6 +16,10 @@ import {
 } from "@/lib/universal-provider/universal-server-props";
 import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 import VideoUploader from "@/components/VideoUploader";
+import YouTubeAudioPlayer from "@/components/YouTubeAudioPlayer";
+const AudioRanger = dynamic(() => import("@/components/AudioRanger"), {
+  ssr: false,
+});
 
 interface CreateMascotProps extends UniversalServerSidePropsInterface {}
 
@@ -79,7 +84,16 @@ const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
         </div>
       </div>
       <p>{JSON.stringify(infoAboutMascot)}</p>
+
+      <br />
+      <br />
       <VideoUploader />
+      <br />
+      <br />
+      <YouTubeAudioPlayer />
+      <br />
+      <br />
+      <AudioRanger audioURL="https://firebasestorage.googleapis.com/v0/b/superlore-dev.appspot.com/o/users%2F5t5JKBpETXdIoNM2wfLsfNsM5m33%2Faudio%2F%E8%95%AD%E7%A7%89%E6%B2%BB%20Xiao%20Bing%20Chih%20%5B%20%E5%A4%96%E4%BA%BA%20Dear%20Stranger%20%5D%20Official%20Music%20Video.mp3?alt=media&token=894fd0ee-f9b7-487c-8a09-cec9b1783e19" />
     </div>
   );
 };

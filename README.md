@@ -64,6 +64,24 @@ To get this available in Vercel deployment, manually copy the env variables into
 
 Be sure to also add `NPM_TOKEN` as an env variable in Vercel. The token is found locally at `.npmrc`
 
+## Allow CORS on Cloud Bucket
+
+1. Install Google Cloud SDK by following the instructions here: https://cloud.google.com/sdk/docs/install
+
+2. Authenticate with your Google account:
+
+```bash
+gcloud auth login
+```
+
+3. Set the CORS configuration for your Firebase Storage bucket (replace `your-bucket-name` with your actual bucket name):
+
+```bash
+gsutil cors set ./firebase/firebase-storage-cors.json gs://superlore-dev.appspot.com
+```
+
+That's it! Now your Firebase Storage bucket allows all CORS requests.
+
 ## User Flow MVP
 
 1. Scrollshow of interesting TikToks
@@ -80,3 +98,4 @@ Be sure to also add `NPM_TOKEN` as an env variable in Vercel. The token is found
 1. Upload a video you want to convert
 2. Select timeframe crop and add to canvas
 3. Add prompt to timecrop and click "generate"
+

@@ -1,0 +1,2 @@
+import type   { MutationResolvers } from './../../../types.generated';
+        export const createVideoTrim: NonNullable<MutationResolvers['createVideoTrim']> = async (_parent, _arg, _ctx) => { /* Implement Mutation.createVideoTrim resolver logic here */ };

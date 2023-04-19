@@ -20,6 +20,8 @@ const nextConfig = {
         page: "/auth/guarded-demo",
       },
       "/mascot/create-mascot": { page: "/mascot/create-mascot" },
+      "/assets/downloader": { page: "/assets/downloader" },
+      "/assets/clipper": { page: "/assets/clipper" },
     };
   },
 };

@@ -29,8 +29,8 @@ export type Media = {
   __typename: 'Media';
   id: Scalars['ID'];
   notes?: Maybe<Scalars['String']>;
-  previewImage: Scalars['String'];
   status: MediaStatus;
+  thumbnail: Scalars['String'];
   title: Scalars['String'];
 };
 
@@ -45,7 +45,7 @@ export type Mutation = {
   createMascot: Mascot;
   createVideoTrim?: Maybe<Media>;
   deleteMedia?: Maybe<Media>;
-  extractVideo?: Maybe<Media>;
+  extractVideo?: Maybe<Array<Scalars['String']>>;
   updateMedia?: Maybe<Media>;
   uploadMedia?: Maybe<Media>;
 };
@@ -228,8 +228,8 @@ export type MascotResolvers<ContextType = any, ParentType extends ResolversParen
 export type MediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Media'] = ResolversParentTypes['Media']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  previewImage?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['MediaStatus'], ParentType, ContextType>;
+  thumbnail?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -238,7 +238,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
   createVideoTrim?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationCreateVideoTrimArgs, 'endTime' | 'id' | 'startTime'>>;
   deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
-  extractVideo?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
+  extractVideo?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
   updateMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
   uploadMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUploadMediaArgs, 'title' | 'url'>>;
 };

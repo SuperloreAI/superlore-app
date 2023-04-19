@@ -44,7 +44,11 @@ const resolvers = {
       args: MutationExtractVideoArgs,
       _context: CustomContext,
       _info: any
-    ) => extractVideoGraphQL(args),
+    ) => {
+      console.log(`---- extractVideoGraphQL ----`);
+      const ids = extractVideoGraphQL(args);
+      return ids;
+    },
   },
 };
 

@@ -33,6 +33,20 @@ $ npx prisma migrate resolve --applied 0_init
 $ npx prisma generate
 ```
 
+If you need to reset the database, you can do so by running within the postgres shell:
+
+```
+\l                                                # list databases
+DROP DATABASE main;                               # drop database
+CREATE DATABASE main WITH TEMPLATE template0;     # create database
+\c main;                                          # connect to database
+
+# run the init script to create tables
+# src/scripts/initializedb.ts
+
+\d                                                # list tables
+```
+
 ## Setting up ENV variables
 
 To get GCP to work, you will need to:

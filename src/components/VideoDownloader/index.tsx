@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Input, Space } from "antd";
 import { Divider } from "antd";
 import { Button } from "antd";
 import { fetchVideoInfo, trimStringWithEllipsis } from "@/lib/helpers/preview";
 import { gql, useMutation } from "@apollo/client";
+import { notification } from "antd";
+import Link from "next/link";
 
 interface VideoDownloaderComponentProps {
   someProp?: string;
@@ -11,10 +13,7 @@ interface VideoDownloaderComponentProps {
 
 const EXTRACT_VIDEO_MUTATION = gql`
   mutation ExtractVideo($url: String!, $type: VideoType!) {
-    extractVideo(url: $url, type: $type) {
-      url
-      type
-    }
+    extractVideo(url: $url, type: $type)
   }
 `;
 
@@ -37,6 +36,8 @@ const useDebouncedEffect = (
 const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
   someProp = "default value",
 }) => {
+  const [api, contextHolder] = notification.useNotification();
+
   const [linkToYoutube, setLinkToYoutube] = useState("");
   const [linkToTikTok, setLinkToTikTok] = useState("");
 
@@ -48,6 +49,29 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
   );
 
   const [extractVideo] = useMutation(EXTRACT_VIDEO_MUTATION);
+
+  const openNotification = useCallback(
+    (path: string) => {
+      const key = `open-${path}`;
+      const btn = (
+        <Space>
+          <Link href={path}>
+            <Button type="primary" size="small">
+              View Asset
+            </Button>
+          </Link>
+        </Space>
+      );
+      api.open({
+        message: "Media Downloaded!",
+        description: "The media has been added to your asset library",
+        btn,
+        key,
+        onClose: close,
+      });
+    },
+    [api]
+  );
 
   useDebouncedEffect(
     () => {
@@ -73,8 +97,10 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
       const { data } = await extractVideo({
         variables: { url: videoUrl, type: videoType },
       });
-
       console.log("Extracted Video:", data);
+      const id = data.extractVideo[0];
+      console.log("ID:", id);
+      openNotification(`/assets/media/${id}`);
     } catch (error) {
       console.error("Error extracting video:", error);
     }
@@ -82,6 +108,7 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
 
   return (
     <section>
+      {contextHolder}
       <Divider></Divider>
       <h3 style={{ width: "100%", textAlign: "center" }}>
         Download Video from URL

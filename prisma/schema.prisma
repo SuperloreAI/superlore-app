@@ -7,92 +7,140 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model documents {
-  id                     Int                   @id @default(autoincrement())
-  user_id                Int
-  content                String
-  document_type          String                @db.VarChar(50)
-  derived_from           Int?
-  vector_db_reference_id String?               @db.VarChar(255)
-  created_at             DateTime              @default(now()) @db.Timestamp(6)
-  updated_at             DateTime              @default(now()) @db.Timestamp(6)
-  documents              documents?            @relation("documentsTodocuments", fields: [derived_from], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  other_documents        documents[]           @relation("documentsTodocuments")
-  users                  users                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  generator_documents    generator_documents[]
+model canvas {
+  id                  String                @id @db.Uuid
+  title               String
+  user_id             String                @db.Uuid
+  video_id            String?               @unique @db.Uuid
+  created_at          DateTime              @default(now()) @db.Timestamp(6)
+  updated_at          DateTime              @default(now()) @db.Timestamp(6)
+  users               users                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos              videos?               @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  canvas_media_assets canvas_media_assets[]
 }
 
-model generator_documents {
-  generator_id Int
-  document_id  Int
-  documents    documents  @relation(fields: [document_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  generators   generators @relation(fields: [generator_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model canvas_media_assets {
+  canvas_id      String       @db.Uuid
+  media_asset_id String       @db.Uuid
+  canvas         canvas       @relation(fields: [canvas_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  media_assets   media_assets @relation(fields: [media_asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([generator_id, document_id])
+  @@id([canvas_id, media_asset_id])
+}
+
+model documents {
+  id                     String   @id @db.Uuid
+  user_id                String   @db.Uuid
+  title                  String
+  document_type          String   @db.VarChar(50)
+  vector_db_reference_id String?  @db.VarChar(255)
+  notes                  String?
+  created_at             DateTime @default(now()) @db.Timestamp(6)
+  updated_at             DateTime @default(now()) @db.Timestamp(6)
+  users                  users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model generators {
-  id                  Int                   @id @default(autoincrement())
-  name                String                @db.VarChar(255)
-  model_type          String                @db.VarChar(50)
-  created_at          DateTime              @default(now()) @db.Timestamp(6)
-  updated_at          DateTime              @default(now()) @db.Timestamp(6)
-  generator_documents generator_documents[]
-  mascots             mascots[]
+  id                      String                    @id @db.Uuid
+  title                   String                    @db.VarChar(255)
+  model_type              String                    @db.VarChar(50)
+  notes                   String?
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamp(6)
+  mascots                 mascots[]
+  media_assets_generators media_assets_generators[]
+  shared_access           shared_access[]
 }
 
 model mascots {
-  id           Int         @id @default(autoincrement())
-  name         String      @db.VarChar(255)
-  user_id      Int
-  prompt       String?
-  thumbnail    String?
-  generator_id Int?
-  created_at   DateTime    @default(now()) @db.Timestamp(6)
-  updated_at   DateTime    @default(now()) @db.Timestamp(6)
-  generators   generators? @relation(fields: [generator_id], references: [id], onUpdate: NoAction)
-  users        users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  videos       videos[]
+  id            String          @id @db.Uuid
+  name          String          @db.VarChar(255)
+  user_id       String          @db.Uuid
+  prompt        String?
+  thumbnail     String?
+  generator_id  String?         @db.Uuid
+  notes         String?
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
+  updated_at    DateTime        @default(now()) @db.Timestamp(6)
+  generators    generators?     @relation(fields: [generator_id], references: [id], onUpdate: NoAction)
+  users         users           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  shared_access shared_access[]
+  videos        videos[]
 
   @@index([user_id], map: "idx_mascots_user_id")
 }
 
 model media_assets {
-  id         Int      @id @default(autoincrement())
-  video_id   Int
-  asset_type String   @db.VarChar(50)
-  url        String   @db.VarChar(255)
-  prompt     String?
-  thumbnail  String?
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @db.Timestamp(6)
-  videos     videos   @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                      String                    @id @db.Uuid
+  title                   String
+  asset_type              String                    @db.VarChar(50)
+  url                     String                    @db.VarChar(255)
+  prompt                  String?
+  thumbnail               String?
+  metadata                Json?
+  archived                Boolean                   @default(false)
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamp(6)
+  canvas_media_assets     canvas_media_assets[]
+  media_assets_generators media_assets_generators[]
+}
 
-  @@index([video_id], map: "idx_media_assets_video_id")
+model media_assets_generators {
+  media_asset_id String       @db.Uuid
+  generator_id   String       @db.Uuid
+  generators     generators   @relation(fields: [generator_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  media_assets   media_assets @relation(fields: [media_asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([media_asset_id, generator_id])
+}
+
+model shared_access {
+  id                                             String      @id @db.Uuid
+  user_id                                        String      @db.Uuid
+  shared_with_user_id                            String      @db.Uuid
+  mascot_id                                      String?     @db.Uuid
+  generator_id                                   String?     @db.Uuid
+  created_at                                     DateTime    @default(now()) @db.Timestamp(6)
+  updated_at                                     DateTime    @default(now()) @db.Timestamp(6)
+  generators                                     generators? @relation(fields: [generator_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  mascots                                        mascots?    @relation(fields: [mascot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_shared_access_shared_with_user_idTousers users       @relation("shared_access_shared_with_user_idTousers", fields: [shared_with_user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_shared_access_user_idTousers             users       @relation("shared_access_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([generator_id], map: "idx_shared_access_generator_id")
+  @@index([mascot_id], map: "idx_shared_access_mascot_id")
+  @@index([shared_with_user_id], map: "idx_shared_access_shared_with_user_id")
+  @@index([user_id], map: "idx_shared_access_user_id")
 }
 
 model users {
-  id         Int         @id @default(autoincrement())
-  name       String      @db.VarChar(255)
-  email      String      @unique @db.VarChar(255)
-  thumbnail  String?
-  created_at DateTime    @default(now()) @db.Timestamp(6)
-  updated_at DateTime    @default(now()) @db.Timestamp(6)
-  documents  documents[]
-  mascots    mascots[]
+  id                                                     String          @id @db.Uuid
+  name                                                   String          @db.VarChar(255)
+  email                                                  String          @unique @db.VarChar(255)
+  thumbnail                                              String?
+  created_at                                             DateTime        @default(now()) @db.Timestamp(6)
+  updated_at                                             DateTime        @default(now()) @db.Timestamp(6)
+  canvas                                                 canvas[]
+  documents                                              documents[]
+  mascots                                                mascots[]
+  shared_access_shared_access_shared_with_user_idTousers shared_access[] @relation("shared_access_shared_with_user_idTousers")
+  shared_access_shared_access_user_idTousers             shared_access[] @relation("shared_access_user_idTousers")
 }
 
 model videos {
-  id                Int            @id @default(autoincrement())
-  name              String         @db.VarChar(255)
-  primary_mascot_id Int
+  id                String   @id @db.Uuid
+  title             String   @db.VarChar(255)
+  primary_mascot_id String?  @db.Uuid
   prompt            String?
-  status            String         @db.VarChar(50)
+  status            String   @db.VarChar(50)
   thumbnail         String?
-  created_at        DateTime       @default(now()) @db.Timestamp(6)
-  updated_at        DateTime       @default(now()) @db.Timestamp(6)
-  media_assets      media_assets[]
-  mascots           mascots        @relation(fields: [primary_mascot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  url               String?  @db.VarChar(255)
+  notes             String?
+  archived          Boolean  @default(false)
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  updated_at        DateTime @default(now()) @db.Timestamp(6)
+  canvas            canvas?
+  mascots           mascots? @relation(fields: [primary_mascot_id], references: [id], onUpdate: NoAction)
 
   @@index([primary_mascot_id], map: "idx_videos_primary_mascot_id")
 }

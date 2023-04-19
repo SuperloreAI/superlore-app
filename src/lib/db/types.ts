@@ -9,3 +9,9 @@ export type CompanyID = string & {
 export type StaffID = string & {
   readonly _: unique symbol;
 };
+
+export enum MediaAssetType {
+  image = "image",
+  video = "video",
+  audio = "audio",
+}

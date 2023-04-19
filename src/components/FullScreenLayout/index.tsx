@@ -1,5 +1,6 @@
 // components/FullScreenLayout.js
 import React, { ReactNode } from "react";
+import SideMenu from "@/components/SideMenu";
 
 interface FullScreenLayoutProps {
   children: ReactNode;
@@ -9,15 +10,27 @@ const FullScreenLayout = ({ children }: FullScreenLayoutProps) => {
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
         minHeight: "100vh",
         width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "white",
+        maxHeight: "100vh",
+        overflow: "hidden",
       }}
     >
-      {children}
+      <SideMenu />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100%",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "white",
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 };

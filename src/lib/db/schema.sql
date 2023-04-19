@@ -47,14 +47,32 @@ CREATE TABLE videos (
 -- Create the media_assets table
 CREATE TABLE media_assets (
     id SERIAL PRIMARY KEY,
-    video_id INTEGER NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
     url VARCHAR(255) NOT NULL,
     prompt TEXT,
     thumbnail TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create the canvas table
+CREATE TABLE canvas (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    video_id INTEGER UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
+);
+
+-- Create the canvas_media_assets table (many-to-many relationship)
+CREATE TABLE canvas_media_assets (
+    canvas_id INTEGER NOT NULL,
+    media_asset_id INTEGER NOT NULL,
+    PRIMARY KEY (canvas_id, media_asset_id),
+    FOREIGN KEY (canvas_id) REFERENCES canvas(id) ON DELETE CASCADE,
+    FOREIGN KEY (media_asset_id) REFERENCES media_assets(id) ON DELETE CASCADE
 );
 
 -- Create the documents table
@@ -71,13 +89,13 @@ CREATE TABLE documents (
     FOREIGN KEY (derived_from) REFERENCES documents(id) ON DELETE CASCADE
 );
 
--- Create the generator_documents table (many-to-many relationship)
-CREATE TABLE generator_documents (
+-- Create the media_assets_generators table (many-to-many relationship)
+CREATE TABLE media_assets_generators (
+    media_asset_id INTEGER NOT NULL,
     generator_id INTEGER NOT NULL,
-    document_id INTEGER NOT NULL,
-    PRIMARY KEY (generator_id, document_id),
-    FOREIGN KEY (generator_id) REFERENCES generators(id) ON DELETE CASCADE,
-    FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+    PRIMARY KEY (media_asset_id, generator_id),
+    FOREIGN KEY (media_asset_id) REFERENCES media_assets(id) ON DELETE CASCADE,
+    FOREIGN KEY (generator_id) REFERENCES generators(id) ON DELETE CASCADE
 );
 
 -- Create the shared_access table
@@ -96,10 +114,8 @@ CREATE TABLE shared_access (
     CHECK ((mascot_id IS NOT NULL AND generator_id IS NULL) OR (mascot_id IS NULL AND generator_id IS NOT NULL))
 );
 
-
 -- Add indexes for frequently accessed data
 CREATE INDEX idx_videos_primary_mascot_id ON videos (primary_mascot_id);
-CREATE INDEX idx_media_assets_video_id ON media_assets (video_id);
 CREATE INDEX idx_mascots_user_id ON mascots (user_id);
 
 -- Add indexes for frequently accessed data

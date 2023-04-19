@@ -1,0 +1,32 @@
+type Query {
+  listMedia(searchString: String, limit: Int, cursorStart: String): [Media]
+  getMedia(id: ID!): Media
+}
+
+type Mutation {
+  uploadMedia(url: String!, title: String!, notes: String): Media
+  deleteMedia(id: ID!): Media
+  updateMedia(id: ID!, title: String, notes: String): Media
+  createVideoTrim(id: ID!, startTime: Float!, endTime: Float!): Media
+  extractVideo(url: String!, type: VideoType!): Media
+}
+
+type Media {
+  id: ID!
+  title: String!
+  notes: String
+  previewImage: String!
+  status: MediaStatus!
+}
+
+enum MediaStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum VideoType {
+  YOUTUBE
+  TIKTOK
+}

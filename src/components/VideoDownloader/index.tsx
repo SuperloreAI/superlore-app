@@ -1,14 +1,22 @@
-// Import React and CSS (optional)
 import React, { useEffect, useState } from "react";
 import { Input, Space } from "antd";
 import { Divider } from "antd";
 import { Button } from "antd";
 import { fetchVideoInfo, trimStringWithEllipsis } from "@/lib/helpers/preview";
+import { gql, useMutation } from "@apollo/client";
 
-// Define TypeScript interface for the component's props
 interface VideoDownloaderComponentProps {
   someProp?: string;
 }
+
+const EXTRACT_VIDEO_MUTATION = gql`
+  mutation ExtractVideo($url: String!, $type: VideoType!) {
+    extractVideo(url: $url, type: $type) {
+      url
+      type
+    }
+  }
+`;
 
 const useDebouncedEffect = (
   effect: () => void,
@@ -26,7 +34,6 @@ const useDebouncedEffect = (
   }, [...dependencies, delay]);
 };
 
-// Create the functional component
 const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
   someProp = "default value",
 }) => {
@@ -39,6 +46,8 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
   const [previewImage, setPreviewImage] = useState(
     "https://i.ytimg.com/vi/dgQZKk-6SXA/maxresdefault.jpg"
   );
+
+  const [extractVideo] = useMutation(EXTRACT_VIDEO_MUTATION);
 
   useDebouncedEffect(
     () => {
@@ -55,6 +64,21 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
     [linkToYoutube, linkToTikTok],
     500
   );
+
+  const handleDownload = async () => {
+    const videoType = linkToYoutube ? "YOUTUBE" : "TIKTOK";
+    const videoUrl = linkToYoutube || linkToTikTok;
+
+    try {
+      const { data } = await extractVideo({
+        variables: { url: videoUrl, type: videoType },
+      });
+
+      console.log("Extracted Video:", data);
+    } catch (error) {
+      console.error("Error extracting video:", error);
+    }
+  };
 
   return (
     <section>
@@ -113,7 +137,7 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
             placeholder="Link to TikTok Video"
           />
           <Divider></Divider>
-          <Button type="primary" block>
+          <Button type="primary" block onClick={handleDownload}>
             Download
           </Button>
         </div>
@@ -123,5 +147,4 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
   );
 };
 
-// Export the component
 export default VideoDownloaderComponent;

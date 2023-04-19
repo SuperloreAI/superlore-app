@@ -1,0 +1,2 @@
+import type   { QueryResolvers } from './../../../types.generated';
+        export const getMedia: NonNullable<QueryResolvers['getMedia']> = async (_parent, _arg, _ctx) => { /* Implement Query.getMedia resolver logic here */ };

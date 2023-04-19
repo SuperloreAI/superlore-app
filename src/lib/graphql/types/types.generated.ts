@@ -25,9 +25,29 @@ export type Mascot = {
   name: Scalars['String'];
 };
 
+export type Media = {
+  __typename: 'Media';
+  id: Scalars['ID'];
+  notes?: Maybe<Scalars['String']>;
+  previewImage: Scalars['String'];
+  status: MediaStatus;
+  title: Scalars['String'];
+};
+
+export type MediaStatus =
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'PENDING'
+  | 'PROCESSING';
+
 export type Mutation = {
   __typename: 'Mutation';
   createMascot: Mascot;
+  createVideoTrim?: Maybe<Media>;
+  deleteMedia?: Maybe<Media>;
+  extractVideo?: Maybe<Media>;
+  updateMedia?: Maybe<Media>;
+  uploadMedia?: Maybe<Media>;
 };
 
 
@@ -35,15 +55,65 @@ export type MutationCreateMascotArgs = {
   name: Scalars['String'];
 };
 
+
+export type MutationCreateVideoTrimArgs = {
+  endTime: Scalars['Float'];
+  id: Scalars['ID'];
+  startTime: Scalars['Float'];
+};
+
+
+export type MutationDeleteMediaArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationExtractVideoArgs = {
+  type: VideoType;
+  url: Scalars['String'];
+};
+
+
+export type MutationUpdateMediaArgs = {
+  id: Scalars['ID'];
+  notes?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUploadMediaArgs = {
+  notes?: InputMaybe<Scalars['String']>;
+  title: Scalars['String'];
+  url: Scalars['String'];
+};
+
 export type Query = {
   __typename: 'Query';
+  getMedia?: Maybe<Media>;
   greetings: Scalars['String'];
+  listMedia?: Maybe<Array<Maybe<Media>>>;
+};
+
+
+export type QueryGetMediaArgs = {
+  id: Scalars['ID'];
 };
 
 
 export type QueryGreetingsArgs = {
   input: Scalars['String'];
 };
+
+
+export type QueryListMediaArgs = {
+  cursorStart?: InputMaybe<Scalars['String']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  searchString?: InputMaybe<Scalars['String']>;
+};
+
+export type VideoType =
+  | 'TIKTOK'
+  | 'YOUTUBE';
 
 
 
@@ -119,8 +189,14 @@ export type ResolversTypes = {
   DemoItem: ResolverTypeWrapper<DemoItem>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Mascot: ResolverTypeWrapper<Mascot>;
+  Media: ResolverTypeWrapper<Media>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
+  MediaStatus: MediaStatus;
   Mutation: ResolverTypeWrapper<{}>;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
   Query: ResolverTypeWrapper<{}>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  VideoType: VideoType;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
@@ -129,8 +205,12 @@ export type ResolversParentTypes = {
   DemoItem: DemoItem;
   String: Scalars['String'];
   Mascot: Mascot;
+  Media: Media;
+  ID: Scalars['ID'];
   Mutation: {};
+  Float: Scalars['Float'];
   Query: {};
+  Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
 };
 
@@ -145,17 +225,34 @@ export type MascotResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Media'] = ResolversParentTypes['Media']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  previewImage?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['MediaStatus'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
+  createVideoTrim?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationCreateVideoTrimArgs, 'endTime' | 'id' | 'startTime'>>;
+  deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
+  extractVideo?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
+  updateMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
+  uploadMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUploadMediaArgs, 'title' | 'url'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<QueryGetMediaArgs, 'id'>>;
   greetings?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryGreetingsArgs, 'input'>>;
+  listMedia?: Resolver<Maybe<Array<Maybe<ResolversTypes['Media']>>>, ParentType, ContextType, Partial<QueryListMediaArgs>>;
 };
 
 export type Resolvers<ContextType = any> = {
   DemoItem?: DemoItemResolvers<ContextType>;
   Mascot?: MascotResolvers<ContextType>;
+  Media?: MediaResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };

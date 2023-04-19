@@ -2,6 +2,11 @@
 import { createYoga, createSchema } from "graphql-yoga";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { typeDefs } from "@/lib/graphql/types/typeDefs.generated";
+import {
+  MutationExtractVideoArgs,
+  VideoType,
+} from "@/lib/graphql/types/types.generated";
+import { extractVideoGraphQL } from "@/lib/asset-library/extract-video";
 
 interface CustomContext {
   req: NextApiRequest;
@@ -34,6 +39,12 @@ const resolvers = {
       id: "DemoMascot",
       name: args.name,
     }),
+    extractVideo: (
+      _parent: any,
+      args: MutationExtractVideoArgs,
+      _context: CustomContext,
+      _info: any
+    ) => extractVideoGraphQL(args),
   },
 };
 

@@ -7,15 +7,15 @@ import Link from "next/link";
 import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
 import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
 import FullScreenLayout from "@/components/FullScreenLayout";
-import VideoClipper from "@/components/VideoClipper";
-import SideMenu from "@/components/SideMenu";
+import MediaGrid from "@/components/MediaGrid";
+import { Space, Button } from "antd";
 
-interface ClipperPageProps {
+interface AssetLibraryPageProps {
   message: string;
   // socketsUri: WebSocketsURI;
 }
 
-const ClipperPage: NextPage<ClipperPageProps> = ({
+const AssetLibraryPage: NextPage<AssetLibraryPageProps> = ({
   message,
   // socketsUri
 }) => {
@@ -42,7 +42,26 @@ const ClipperPage: NextPage<ClipperPageProps> = ({
   // }
   return (
     <FullScreenLayout>
-      <VideoClipper />
+      <div style={{ overflowY: "scroll", padding: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-between",
+          }}
+        >
+          <h1>Asset Library</h1>
+          <div>
+            <Button type="text">Upload</Button>
+            <Link href="/assets/downloader" rel="noopener noreferrer">
+              <Button type="primary">Extract YouTube/TikTok</Button>
+            </Link>
+          </div>
+        </div>
+        <br />
+        <MediaGrid />
+      </div>
       {/* <p>
         {connected
           ? "Connected to the websockets server"
@@ -86,4 +105,4 @@ export const getServerSideProps = async () => {
   };
 };
 
-export default withUniversalProvider(ClipperPage);
+export default withUniversalProvider(AssetLibraryPage);

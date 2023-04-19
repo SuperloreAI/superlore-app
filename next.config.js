@@ -22,6 +22,7 @@ const nextConfig = {
       "/mascot/create-mascot": { page: "/mascot/create-mascot" },
       "/assets/downloader": { page: "/assets/downloader" },
       "/assets/clipper": { page: "/assets/clipper" },
+      "/assets/library": { page: "/assets/library" },
     };
   },
 };

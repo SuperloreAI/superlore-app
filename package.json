@@ -10,6 +10,7 @@
     "generate": "graphql-codegen --config ./src/lib/graphql/codegen.ts"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.0.1",
     "@apollo/client": "^3.7.11",
     "@google-cloud/secret-manager": "^4.2.1",
     "@prisma/client": "^4.12.0",

@@ -199,3 +199,76 @@ export const clipVideo = async ({
   await addMediaAsset(video);
   return response.data;
 };
+
+export async function listMedia(
+  searchString: string,
+  limit: number,
+  cursorStart: string
+) {
+  await initializePool();
+  const { pool } = getPool();
+
+  console.log(`
+  
+    searchString: ${searchString}
+    limit: ${limit}
+    cursorStart: ${cursorStart}
+  
+  `);
+
+  const query = `
+    SELECT * FROM media_assets
+    WHERE title ILIKE $1
+    AND ($2::uuid IS NULL OR id > $2)
+    ORDER BY created_at DESC
+    LIMIT $3;
+  `;
+
+  const values = [`%${searchString || ""}%`, cursorStart || null, limit || 10];
+  console.log(`listMedia: ${searchString}`);
+  console.log(query);
+
+  try {
+    const res = await pool.query(query, values);
+    const mediaAssets = res.rows;
+
+    return mediaAssets.map((mediaAsset) => ({
+      id: mediaAsset.id,
+      title: mediaAsset.title,
+      assetType: mediaAsset.asset_type,
+      url: mediaAsset.url,
+      prompt: mediaAsset.prompt,
+      thumbnail: mediaAsset.thumbnail,
+      metadata: mediaAsset.metadata,
+      archived: mediaAsset.archived,
+      createdAt: mediaAsset.created_at,
+      updatedAt: mediaAsset.updated_at,
+      status: mediaAsset.status,
+    }));
+  } catch (err) {
+    console.error("Error fetching media assets:", err);
+    throw err;
+  }
+}
+
+interface UpdateMediaAssetProps {
+  id: string;
+  title: string;
+  notes: string;
+}
+export async function updateMediaAsset(args: UpdateMediaAssetProps) {
+  await initializePool();
+  const { id, title, notes } = args;
+  const { pool } = getPool();
+  const query = "UPDATE media_assets SET title = $1 WHERE id = $2";
+  const values = [title, id];
+  try {
+    const res = await pool.query(query, values);
+    const updatedRow = res.rows[0];
+    console.log(updatedRow);
+    return { id, title, notes };
+  } catch (err) {
+    console.error("Error updating media asset:", err);
+    throw err;
+  }
+}

@@ -6,7 +6,7 @@ type Query {
 type Mutation {
   uploadMedia(url: String!, title: String!, notes: String): Media
   deleteMedia(id: ID!): Media
-  updateMedia(id: ID!, title: String, notes: String): Media
+  updateMedia(id: ID!, title: String, notes: String): ID!
   clipVideo(id: ID!, startTime: Float!, endTime: Float!, url: String!): ClipResult
   extractVideo(url: String!, type: VideoType!): [String!]
 }

@@ -11,6 +11,8 @@ import {
   clipVideo,
   extractVideoGQL,
   getMediaAssetGQL,
+  listMedia,
+  updateMediaAsset,
 } from "@/lib/graphql/schemas/assets/extract-video";
 
 interface CustomContext {
@@ -39,6 +41,12 @@ const resolvers = {
       _context: CustomContext,
       _info: any
     ) => getMediaAssetGQL(args),
+    listMedia: (
+      _parent: any,
+      args: { searchString: string; limit: number; cursorStart: string },
+      _context: CustomContext,
+      _info: any
+    ) => listMedia(args.searchString, args.limit, args.cursorStart),
   },
   Mutation: {
     createMascot: (
@@ -72,6 +80,16 @@ const resolvers = {
       console.log(`from GQL url=${url}`);
       const clippedVideoData = await clipVideo({ id, startTime, endTime, url });
       return clippedVideoData;
+    },
+    updateMedia: async (
+      _parent: any,
+      args: { id: string; title: string; notes: string },
+      _context: CustomContext,
+      _info: any
+    ) => {
+      const { id, title, notes } = args;
+      const updatedMedia = await updateMediaAsset({ id, title, notes });
+      return updatedMedia.id;
     },
   },
 };

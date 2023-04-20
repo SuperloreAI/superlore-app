@@ -6,24 +6,28 @@ export interface SideMenuItem {
   id: string;
   text: string;
   destination: string;
+  disabled: boolean;
 }
 
 const menuItems = [
-  { id: "1", text: "Create Video", destination: "/" },
+  { id: "1", text: "Create Video", destination: "/canvas", disabled: false },
   {
     id: "2",
     text: "Asset Library",
     destination: "/assets/library",
+    disabled: false,
   },
   {
     id: "3",
     text: "Video History",
     destination: "/",
+    disabled: true,
   },
   {
     id: "4",
     text: "Profile Settings",
     destination: "/",
+    disabled: true,
   },
 ];
 const logo =
@@ -37,22 +41,29 @@ const SideMenu = () => {
       <div className="p-4">
         <img src={logo} alt="Logo" className="w-32 h-auto mb-8" />
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {menuItems.map((menuItem: SideMenuItem) => (
-            <Link
-              key={menuItem.id}
-              href={menuItem.destination}
-              rel="noopener noreferrer"
-              style={{ margin: "20px 0px" }}
-            >
-              <Button>{menuItem.text}</Button>
-            </Link>
-          ))}
+          {menuItems.map((menuItem: SideMenuItem) =>
+            menuItem.disabled ? (
+              <Button key={menuItem.id} disabled style={{ margin: "20px 0px" }}>
+                {menuItem.text}
+              </Button>
+            ) : (
+              <Link
+                key={menuItem.id}
+                href={menuItem.destination}
+                rel="noopener noreferrer"
+                style={{ margin: "20px 0px" }}
+              >
+                <Button>{menuItem.text}</Button>
+              </Link>
+            )
+          )}
         </div>
       </div>
       <div className="p-4">
         <button
           onClick={onSwitchProfile}
           className="text-left w-full text-lg font-medium text-gray-700 hover:text-gray-900 focus:outline-none"
+          disabled
         >
           Switch Profile
         </button>

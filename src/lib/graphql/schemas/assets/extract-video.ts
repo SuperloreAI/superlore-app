@@ -164,11 +164,13 @@ export const clipVideo = async ({
   startTime,
   endTime,
   url,
+  title,
 }: {
   id: string;
   startTime: number;
   endTime: number;
   url: string;
+  title: string;
 }) => {
   console.log(`url=${url}`);
   const mediaManipulationServer = process.env.MEDIA_MANIPULATION_ENDPOINT;
@@ -189,7 +191,7 @@ export const clipVideo = async ({
 
   const video = {
     id: response.data.id,
-    title: `Video ${id} clipped from ${id}`,
+    title: title || `Video ${id} clipped from ${id}`,
     assetType: MediaAssetType.VIDEO,
     url: response.data.url,
     prompt: "",
@@ -231,7 +233,9 @@ export async function listMedia(
   try {
     const res = await pool.query(query, values);
     const mediaAssets = res.rows;
-
+    console.log(`---- mediaAssets`);
+    console.log(mediaAssets[0]);
+    console.log(mediaAssets[0].metadata);
     return mediaAssets.map((mediaAsset) => ({
       id: mediaAsset.id,
       title: mediaAsset.title,

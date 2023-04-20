@@ -14,8 +14,15 @@ export const CLIP_VIDEO = gql`
     $startTime: Float!
     $endTime: Float!
     $url: String!
+    $title: String!
   ) {
-    clipVideo(id: $id, startTime: $startTime, endTime: $endTime, url: $url) {
+    clipVideo(
+      id: $id
+      startTime: $startTime
+      endTime: $endTime
+      url: $url
+      title: $title
+    ) {
       id
       url
     }
@@ -120,6 +127,7 @@ const VideoClipper: React.FC<VideoClipperProps> = ({ mediaAsset }) => {
         description: "The media has been added to your asset library",
         btn,
         key,
+        duration: null,
       });
     },
     [api]
@@ -138,6 +146,7 @@ const VideoClipper: React.FC<VideoClipperProps> = ({ mediaAsset }) => {
           startTime,
           endTime,
           url: mediaAsset.url,
+          title: clipTitle,
         },
       });
       console.log(response);

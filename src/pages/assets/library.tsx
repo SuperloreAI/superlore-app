@@ -94,6 +94,23 @@ export const getServerSideProps = async () => {
           status
           assetType
           url
+          metadata {
+            ... on VideoMetadata {
+              width
+              height
+              duration
+              aspectRatio
+              frameRate
+              videoCodec
+              audioCodec
+              originalSource
+            }
+            ... on AudioMetadata {
+              duration
+              audioCodec
+              originalSource
+            }
+          }
         }
       }
     `,

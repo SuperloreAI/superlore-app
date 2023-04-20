@@ -75,10 +75,23 @@ const resolvers = {
         startTime,
         endTime,
         url,
-      }: { id: string; startTime: number; endTime: number; url: string }
+        title,
+      }: {
+        id: string;
+        startTime: number;
+        endTime: number;
+        url: string;
+        title: string;
+      }
     ) => {
       console.log(`from GQL url=${url}`);
-      const clippedVideoData = await clipVideo({ id, startTime, endTime, url });
+      const clippedVideoData = await clipVideo({
+        id,
+        startTime,
+        endTime,
+        url,
+        title,
+      });
       return clippedVideoData;
     },
     updateMedia: async (
@@ -90,6 +103,33 @@ const resolvers = {
       const { id, title, notes } = args;
       const updatedMedia = await updateMediaAsset({ id, title, notes });
       return updatedMedia.id;
+    },
+  },
+  Media: {
+    metadata(parent: any, _args: any, _context: CustomContext, _info: any) {
+      if (parent.metadata.videoCodec || parent.metadata.frameRate) {
+        return { ...parent.metadata, __typename: "VideoMetadata" };
+      }
+
+      if (parent.metadata.audioCodec) {
+        return { ...parent.metadata, __typename: "AudioMetadata" };
+      }
+
+      return null;
+    },
+  },
+
+  MediaMetadata: {
+    __resolveType(obj: any, _context: CustomContext, _info: any) {
+      if (obj.videoCodec || obj.frameRate) {
+        return "VideoMetadata";
+      }
+
+      if (obj.audioCodec) {
+        return "AudioMetadata";
+      }
+
+      return null;
     },
   },
 };

@@ -14,7 +14,7 @@
     "@apollo/client": "^3.7.11",
     "@google-cloud/secret-manager": "^4.2.1",
     "@prisma/client": "^4.12.0",
-    "@superlore/helpers": "^1.0.3",
+    "@superlore/helpers": "^1.0.10",
     "@types/pg": "^8.6.6",
     "@types/react": "18.0.33",
     "@types/react-dom": "18.0.11",

@@ -7,7 +7,7 @@ type Mutation {
   uploadMedia(url: String!, title: String!, notes: String): Media
   deleteMedia(id: ID!): Media
   updateMedia(id: ID!, title: String, notes: String): ID!
-  clipVideo(id: ID!, startTime: Float!, endTime: Float!, url: String!): ClipResult
+  clipVideo(id: ID!, startTime: Float!, endTime: Float!, url: String!, title: String!): ClipResult
   extractVideo(url: String!, type: VideoType!): [String!]
 }
 
@@ -19,7 +19,27 @@ type Media {
   status: MediaStatus!
   assetType: AssetType!
   url: String!
+  metadata: MediaMetadata
 }
+
+type VideoMetadata {
+  width: Int
+  height: Int
+  duration: Float
+  aspectRatio: String
+  frameRate: Int
+  videoCodec: String
+  audioCodec: String
+  originalSource: String
+}
+
+type AudioMetadata {
+  duration: Float
+  audioCodec: String
+  originalSource: String
+}
+
+union MediaMetadata = VideoMetadata | AudioMetadata
 
 type ClipResult {
   id: ID!
@@ -28,8 +48,7 @@ type ClipResult {
 
 enum MediaStatus {
   PENDING
-  PROCESSING
-  COMPLETED
+  READY
   FAILED
 }
 

@@ -9,6 +9,9 @@ import {
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import { debounce } from "lodash";
 import Link from "next/link";
+import { renderAssetStatusTag, renderAssetTypeTag } from "@/lib/helpers/tags";
+import { MediaAssetStatus, MediaAssetType } from "@/lib/db/types";
+import { formatTime } from "@/lib/helpers/time";
 
 interface MediaGridProps {
   graphqlEndpoint: string;
@@ -120,7 +123,11 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                     marginBottom: "1rem",
                   }}
                 />
-                <p>Type: {file.assetType}</p>
+                {file.metadata?.duration && (
+                  <p>{formatTime(file.metadata.duration)}</p>
+                )}
+                {renderAssetStatusTag(file.status as MediaAssetStatus)}
+                {renderAssetTypeTag(file.assetType as MediaAssetType)}
               </Card>
             </Link>
           </Col>

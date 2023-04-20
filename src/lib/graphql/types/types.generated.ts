@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -18,6 +19,13 @@ export type AssetType =
   | 'AUDIO'
   | 'IMAGE'
   | 'VIDEO';
+
+export type AudioMetadata = {
+  __typename: 'AudioMetadata';
+  audioCodec?: Maybe<Scalars['String']>;
+  duration?: Maybe<Scalars['Float']>;
+  originalSource?: Maybe<Scalars['String']>;
+};
 
 export type ClipResult = {
   __typename: 'ClipResult';
@@ -40,6 +48,7 @@ export type Media = {
   __typename: 'Media';
   assetType: AssetType;
   id: Scalars['ID'];
+  metadata?: Maybe<MediaMetadata>;
   notes?: Maybe<Scalars['String']>;
   status: MediaStatus;
   thumbnail: Scalars['String'];
@@ -47,11 +56,12 @@ export type Media = {
   url: Scalars['String'];
 };
 
+export type MediaMetadata = AudioMetadata | VideoMetadata;
+
 export type MediaStatus =
-  | 'COMPLETED'
   | 'FAILED'
   | 'PENDING'
-  | 'PROCESSING';
+  | 'READY';
 
 export type Mutation = {
   __typename: 'Mutation';
@@ -68,6 +78,7 @@ export type MutationClipVideoArgs = {
   endTime: Scalars['Float'];
   id: Scalars['ID'];
   startTime: Scalars['Float'];
+  title: Scalars['String'];
   url: Scalars['String'];
 };
 
@@ -123,6 +134,18 @@ export type QueryListMediaArgs = {
   cursorStart?: InputMaybe<Scalars['String']>;
   limit?: InputMaybe<Scalars['Int']>;
   searchString?: InputMaybe<Scalars['String']>;
+};
+
+export type VideoMetadata = {
+  __typename: 'VideoMetadata';
+  aspectRatio?: Maybe<Scalars['String']>;
+  audioCodec?: Maybe<Scalars['String']>;
+  duration?: Maybe<Scalars['Float']>;
+  frameRate?: Maybe<Scalars['Int']>;
+  height?: Maybe<Scalars['Int']>;
+  originalSource?: Maybe<Scalars['String']>;
+  videoCodec?: Maybe<Scalars['String']>;
+  width?: Maybe<Scalars['Int']>;
 };
 
 export type VideoType =
@@ -196,39 +219,60 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+/** Mapping of union types */
+export type ResolversUnionTypes = {
+  MediaMetadata: ( AudioMetadata ) | ( VideoMetadata );
+};
 
+/** Mapping of union parent types */
+export type ResolversUnionParentTypes = {
+  MediaMetadata: ( AudioMetadata ) | ( VideoMetadata );
+};
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   AssetType: AssetType;
+  AudioMetadata: ResolverTypeWrapper<AudioMetadata>;
+  String: ResolverTypeWrapper<Scalars['String']>;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
   ClipResult: ResolverTypeWrapper<ClipResult>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
-  String: ResolverTypeWrapper<Scalars['String']>;
   DemoItem: ResolverTypeWrapper<DemoItem>;
   Mascot: ResolverTypeWrapper<Mascot>;
-  Media: ResolverTypeWrapper<Media>;
+  Media: ResolverTypeWrapper<Omit<Media, 'metadata'> & { metadata?: Maybe<ResolversTypes['MediaMetadata']> }>;
+  MediaMetadata: ResolverTypeWrapper<ResolversUnionTypes['MediaMetadata']>;
   MediaStatus: MediaStatus;
   Mutation: ResolverTypeWrapper<{}>;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  VideoMetadata: ResolverTypeWrapper<VideoMetadata>;
   VideoType: VideoType;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  AudioMetadata: AudioMetadata;
+  String: Scalars['String'];
+  Float: Scalars['Float'];
   ClipResult: ClipResult;
   ID: Scalars['ID'];
-  String: Scalars['String'];
   DemoItem: DemoItem;
   Mascot: Mascot;
-  Media: Media;
+  Media: Omit<Media, 'metadata'> & { metadata?: Maybe<ResolversParentTypes['MediaMetadata']> };
+  MediaMetadata: ResolversUnionParentTypes['MediaMetadata'];
   Mutation: {};
-  Float: Scalars['Float'];
   Query: {};
   Int: Scalars['Int'];
+  VideoMetadata: VideoMetadata;
   Boolean: Scalars['Boolean'];
+};
+
+export type AudioMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['AudioMetadata'] = ResolversParentTypes['AudioMetadata']> = {
+  audioCodec?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  originalSource?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ClipResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClipResult'] = ResolversParentTypes['ClipResult']> = {
@@ -251,6 +295,7 @@ export type MascotResolvers<ContextType = any, ParentType extends ResolversParen
 export type MediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Media'] = ResolversParentTypes['Media']> = {
   assetType?: Resolver<ResolversTypes['AssetType'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  metadata?: Resolver<Maybe<ResolversTypes['MediaMetadata']>, ParentType, ContextType>;
   notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['MediaStatus'], ParentType, ContextType>;
   thumbnail?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -259,8 +304,12 @@ export type MediaResolvers<ContextType = any, ParentType extends ResolversParent
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MediaMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['MediaMetadata'] = ResolversParentTypes['MediaMetadata']> = {
+  __resolveType: TypeResolveFn<'AudioMetadata' | 'VideoMetadata', ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  clipVideo?: Resolver<Maybe<ResolversTypes['ClipResult']>, ParentType, ContextType, RequireFields<MutationClipVideoArgs, 'endTime' | 'id' | 'startTime' | 'url'>>;
+  clipVideo?: Resolver<Maybe<ResolversTypes['ClipResult']>, ParentType, ContextType, RequireFields<MutationClipVideoArgs, 'endTime' | 'id' | 'startTime' | 'title' | 'url'>>;
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
   deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
   extractVideo?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
@@ -274,12 +323,27 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   listMedia?: Resolver<Maybe<Array<Maybe<ResolversTypes['Media']>>>, ParentType, ContextType, Partial<QueryListMediaArgs>>;
 };
 
+export type VideoMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['VideoMetadata'] = ResolversParentTypes['VideoMetadata']> = {
+  aspectRatio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  audioCodec?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  duration?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  frameRate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  height?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  originalSource?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  videoCodec?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  width?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+  AudioMetadata?: AudioMetadataResolvers<ContextType>;
   ClipResult?: ClipResultResolvers<ContextType>;
   DemoItem?: DemoItemResolvers<ContextType>;
   Mascot?: MascotResolvers<ContextType>;
   Media?: MediaResolvers<ContextType>;
+  MediaMetadata?: MediaMetadataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  VideoMetadata?: VideoMetadataResolvers<ContextType>;
 };
 

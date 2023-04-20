@@ -75,6 +75,7 @@ model media_assets {
   title                   String
   asset_type              String                    @db.VarChar(50)
   url                     String                    @db.VarChar(255)
+  status                  String                    @db.VarChar(50)
   prompt                  String?
   thumbnail               String?
   metadata                Json?

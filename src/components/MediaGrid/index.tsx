@@ -1,71 +1,132 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Input, Button } from "antd";
 import { FileOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  Media,
+  Query,
+  QueryListMediaArgs,
+} from "@/lib/graphql/types/types.generated";
+import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+import { debounce } from "lodash";
+import Link from "next/link";
 
-interface MediaFile {
-  id: string;
-  type: "video" | "audio";
-  name: string;
+interface MediaGridProps {
+  graphqlEndpoint: string;
+  initialMedia: Media[];
 }
 
-const generateMockData = (count: number): MediaFile[] => {
-  return Array.from({ length: count }, (_, idx) => ({
-    id: `file-${idx}`,
-    type: idx % 2 === 0 ? "video" : "audio",
-    name: `Media File ${idx + 1}`,
-  }));
-};
+const GET_MEDIA = gql`
+  query ListMedia($searchString: String, $limit: Int, $cursorStart: String) {
+    listMedia(
+      searchString: $searchString
+      limit: $limit
+      cursorStart: $cursorStart
+    ) {
+      id
+      title
+      thumbnail
+      status
+      assetType
+      url
+    }
+  }
+`;
 
-const MediaGrid: React.FC = () => {
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+const MediaGrid: React.FC<MediaGridProps> = ({
+  graphqlEndpoint,
+  initialMedia,
+}) => {
   const [searchText, setSearchText] = useState("");
-  const [filteredMediaFiles, setFilteredMediaFiles] = useState<MediaFile[]>([]);
-  const [visibleFiles, setVisibleFiles] = useState<MediaFile[]>([]);
+  const [visibleFiles, setVisibleFiles] = useState<Media[]>(initialMedia);
+  const [cursorStart, setCursorStart] = useState("");
+  const [hasMoreItems, setHasMoreItems] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const FETCH_LIMIT = 30;
 
   useEffect(() => {
-    // Replace this with your API call to fetch media files
-    const allMediaFiles = generateMockData(100);
-    setMediaFiles(allMediaFiles);
-    setFilteredMediaFiles(allMediaFiles);
-  }, []);
+    setCursorStart("");
+  }, [searchText]);
 
-  useEffect(() => {
-    const search = searchText.trim().toLowerCase();
-    const filtered = mediaFiles.filter((file) =>
-      file.name.toLowerCase().includes(search)
-    );
-    setFilteredMediaFiles(filtered);
-  }, [searchText, mediaFiles]);
+  const client = new ApolloClient({
+    uri: graphqlEndpoint,
+    cache: new InMemoryCache(),
+  });
 
-  useEffect(() => {
-    setVisibleFiles(filteredMediaFiles.slice(0, 30));
-  }, [filteredMediaFiles]);
+  const fetchMedia = async (searchString: string, cursorStart: string) => {
+    const response = await client.query<
+      Pick<Query, "listMedia">,
+      QueryListMediaArgs
+    >({
+      query: GET_MEDIA,
+      variables: {
+        searchString,
+        limit: FETCH_LIMIT,
+        cursorStart,
+      },
+    });
+    if (!response || !response.data) {
+      console.error("Error: response data is undefined");
+      return [];
+    }
 
-  const handleSeeMoreClick = () => {
-    setVisibleFiles(filteredMediaFiles.slice(0, visibleFiles.length + 30));
+    return response.data.listMedia as Media[];
+  };
+
+  const debouncedHandleSearchChange = debounce(async (searchValue: string) => {
+    const fetchedMedia = await fetchMedia(searchValue, "");
+    setVisibleFiles(fetchedMedia as Media[]);
+    setCursorStart(fetchedMedia[fetchedMedia.length - 1]?.id || "");
+    setHasMoreItems(fetchedMedia.length >= FETCH_LIMIT);
+    setIsSearching(false);
+  }, 2000);
+
+  const handleSearchChange = (searchValue: string) => {
+    setSearchText(searchValue);
+    setIsSearching(true);
+    debouncedHandleSearchChange(searchValue);
+  };
+
+  const handleSeeMoreClick = async () => {
+    const fetchedMedia = await fetchMedia(searchText, cursorStart);
+    setVisibleFiles([...visibleFiles, ...(fetchedMedia as Media[])]);
+    setCursorStart(fetchedMedia[fetchedMedia.length - 1]?.id || "");
+    setHasMoreItems(fetchedMedia.length >= FETCH_LIMIT);
   };
 
   return (
     <section>
-      <Input
+      <Input.Search
         placeholder="Search media files"
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(e) => handleSearchChange(e.target.value)}
+        loading={isSearching}
       />
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         {visibleFiles.map((file) => (
           <Col key={file.id} xs={12} sm={8} md={6} lg={4}>
-            <Card
-              title={file.name}
-              extra={<FileOutlined />}
-              style={{ height: "100%" }}
-            >
-              <p>Type: {file.type}</p>
-            </Card>
+            <Link href={`/assets/media/${file.id}`}>
+              <Card
+                title={file.title}
+                extra={<FileOutlined />}
+                style={{ height: "100%", minWidth: "150px" }}
+              >
+                <img
+                  src={file.thumbnail}
+                  alt={`Thumbnail for ${file.title}`}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    marginBottom: "1rem",
+                  }}
+                />
+                <p>Type: {file.assetType}</p>
+              </Card>
+            </Link>
           </Col>
         ))}
       </Row>
-      {visibleFiles.length < filteredMediaFiles.length && (
+      {hasMoreItems && (
         <Button
           type="primary"
           icon={<PlusCircleOutlined />}

@@ -59,7 +59,7 @@ export type Mutation = {
   createMascot: Mascot;
   deleteMedia?: Maybe<Media>;
   extractVideo?: Maybe<Array<Scalars['String']>>;
-  updateMedia?: Maybe<Media>;
+  updateMedia: Scalars['ID'];
   uploadMedia?: Maybe<Media>;
 };
 
@@ -264,7 +264,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
   deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
   extractVideo?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
-  updateMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
+  updateMedia?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
   uploadMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUploadMediaArgs, 'title' | 'url'>>;
 };
 

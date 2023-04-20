@@ -5,7 +5,7 @@ import {
 } from "@/lib/graphql/types/types.generated";
 import useSocket from "@/lib/hooks/websockets";
 import { WebSocketsURI } from "@/lib/types/base.types";
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+import { ApolloClient, gql, InMemoryCache, useMutation } from "@apollo/client";
 import { NextPage, GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
@@ -13,7 +13,7 @@ import { withUniversalProvider } from "@/lib/universal-provider/with-universal-p
 import FullScreenLayout from "@/components/FullScreenLayout";
 import { MediaAssetStatus, MediaAssetType } from "@/lib/db/types";
 import { useState } from "react";
-import { Divider, Input, Button, Space } from "antd";
+import { Divider, Input, Button, Space, message } from "antd";
 import { renderAssetStatusTag, renderAssetTypeTag } from "@/lib/helpers/tags";
 
 interface MediaAssetPageProps {
@@ -22,12 +22,61 @@ interface MediaAssetPageProps {
   // socketsUri: WebSocketsURI;
 }
 
+const GET_MEDIA = gql`
+  query GetMedia($id: ID!) {
+    getMedia(id: $id) {
+      id
+      title
+      notes
+      thumbnail
+      status
+      assetType
+      url
+    }
+  }
+`;
+
+const UPDATE_MEDIA = gql`
+  mutation UpdateMedia($id: ID!, $title: String, $notes: String) {
+    updateMedia(id: $id, title: $title, notes: $notes)
+  }
+`;
+
 const MediaAssetPage: NextPage<MediaAssetPageProps> = ({ mediaAsset }) => {
   const [title, setTitle] = useState(mediaAsset?.title || "");
   const [notes, setNotes] = useState(mediaAsset?.notes || "");
 
+  const [updateMedia] = useMutation(UPDATE_MEDIA, {
+    refetchQueries: [
+      {
+        query: GET_MEDIA,
+        variables: { id: mediaAsset?.id || "" },
+      },
+    ],
+    onCompleted: () => {
+      success();
+    },
+  });
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  if (!mediaAsset) return <p>Missing Media Asset</p>;
+
   const handleUpdateClick = () => {
-    // Implement the GQL mutation for update here
+    updateMedia({
+      variables: {
+        id: mediaAsset.id,
+        title,
+        notes,
+      },
+    });
+  };
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "Updated Media Asset",
+    });
   };
 
   const renderMedia = () => {
@@ -52,6 +101,7 @@ const MediaAssetPage: NextPage<MediaAssetPageProps> = ({ mediaAsset }) => {
   console.log(mediaAsset);
   return (
     <FullScreenLayout>
+      {contextHolder}
       <h1>Asset Page</h1>
       <Divider />
       <div
@@ -135,19 +185,7 @@ export const getServerSideProps = async (
     Pick<Query, "getMedia">,
     QueryGetMediaArgs
   >({
-    query: gql`
-      query GetMedia($id: ID!) {
-        getMedia(id: $id) {
-          id
-          title
-          notes
-          thumbnail
-          status
-          assetType
-          url
-        }
-      }
-    `,
+    query: GET_MEDIA,
     variables: {
       id: mediaAssetID,
     },

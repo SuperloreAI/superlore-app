@@ -5,6 +5,8 @@ import {
   postgresDevSecret,
   firebaseConfigSecret,
 } from "@/lib/constants";
+import dotenv from "dotenv";
+dotenv.config();
 
 async function accessSecretVersion(
   projectId: string,
@@ -28,7 +30,9 @@ async function accessSecretVersion(
     auth,
   });
   const name = `projects/${projectId}/secrets/${secretId}/versions/${versionId}`;
+
   const [response] = await client.accessSecretVersion({ name });
+
   const secretValue = response.payload?.data?.toString();
   if (!secretValue) {
     throw Error("No secret value found");

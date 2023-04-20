@@ -1,8 +1,12 @@
-import { Query, QueryGreetingsArgs } from "@/lib/graphql/types/types.generated";
+import {
+  Query,
+  QueryGetMediaArgs,
+  QueryGreetingsArgs,
+} from "@/lib/graphql/types/types.generated";
 import useSocket from "@/lib/hooks/websockets";
 import { WebSocketsURI } from "@/lib/types/base.types";
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
-import { NextPage } from "next";
+import { NextPage, GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { UniversalGetServerSideProps } from "@/lib/universal-provider/universal-server-props";
 import { withUniversalProvider } from "@/lib/universal-provider/with-universal-provider";
@@ -11,12 +15,12 @@ import VideoClipper from "@/components/VideoClipper";
 import SideMenu from "@/components/SideMenu";
 
 interface ClipperPageProps {
-  message: string;
+  mediaAsset: Query["getMedia"];
   // socketsUri: WebSocketsURI;
 }
 
 const ClipperPage: NextPage<ClipperPageProps> = ({
-  message,
+  mediaAsset,
   // socketsUri
 }) => {
   // const { connected, error, emit, on } = useSocket(socketsUri);
@@ -42,7 +46,7 @@ const ClipperPage: NextPage<ClipperPageProps> = ({
   // }
   return (
     <FullScreenLayout>
-      <VideoClipper />
+      <VideoClipper mediaAsset={mediaAsset} />
       {/* <p>
         {connected
           ? "Connected to the websockets server"
@@ -52,7 +56,9 @@ const ClipperPage: NextPage<ClipperPageProps> = ({
   );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const universalServerProps = await UniversalGetServerSideProps();
   const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
   // const WEBSOCKETS_ENDPOINT = process.env.WEBSOCKETS_ENDPOINT;
@@ -60,27 +66,43 @@ export const getServerSideProps = async () => {
     uri: GRAPHQL_ENDPOINT,
     cache: new InMemoryCache(),
   });
+  const mediaAssetID = context.params?.mediaID;
 
+  console.log(`mediaAssetID = ${mediaAssetID}`);
+  // Ensure mediaAssetID is a string, otherwise return a 404 error
+  if (typeof mediaAssetID !== "string") {
+    return {
+      notFound: true,
+    };
+  }
   const { data } = await client.query<
-    Pick<Query, "greetings">,
-    QueryGreetingsArgs
+    Pick<Query, "getMedia">,
+    QueryGetMediaArgs
   >({
     query: gql`
-      query Greetings($input: String!) {
-        greetings(input: $input)
+      query GetMedia($id: ID!) {
+        getMedia(id: $id) {
+          id
+          title
+          notes
+          thumbnail
+          status
+          assetType
+          url
+        }
       }
     `,
     variables: {
-      input: "Hello World",
+      id: mediaAssetID,
     },
   });
-
-  const { greetings } = data;
+  console.log(data);
+  const { getMedia } = data;
 
   return {
     props: {
       ...universalServerProps.props,
-      message: greetings,
+      mediaAsset: getMedia,
       // socketsUri: WEBSOCKETS_ENDPOINT,
     },
   };

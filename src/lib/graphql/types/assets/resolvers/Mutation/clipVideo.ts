@@ -1,0 +1,2 @@
+import type   { MutationResolvers } from './../../../types.generated';
+        export const clipVideo: NonNullable<MutationResolvers['clipVideo']> = async (_parent, _arg, _ctx) => { /* Implement Mutation.clipVideo resolver logic here */ };

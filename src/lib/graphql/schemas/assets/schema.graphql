@@ -7,16 +7,23 @@ type Mutation {
   uploadMedia(url: String!, title: String!, notes: String): Media
   deleteMedia(id: ID!): Media
   updateMedia(id: ID!, title: String, notes: String): Media
-  createVideoTrim(id: ID!, startTime: Float!, endTime: Float!): Media
-  extractVideo(url: String!, type: VideoType!): Media
+  clipVideo(id: ID!, startTime: Float!, endTime: Float!, url: String!): ClipResult
+  extractVideo(url: String!, type: VideoType!): [String!]
 }
 
 type Media {
   id: ID!
   title: String!
   notes: String
-  previewImage: String!
+  thumbnail: String!
   status: MediaStatus!
+  assetType: AssetType!
+  url: String!
+}
+
+type ClipResult {
+  id: ID!
+  url: String!
 }
 
 enum MediaStatus {
@@ -29,4 +36,10 @@ enum MediaStatus {
 enum VideoType {
   YOUTUBE
   TIKTOK
+}
+
+enum AssetType {
+  IMAGE
+  VIDEO
+  AUDIO
 }

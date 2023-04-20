@@ -1,16 +1,6 @@
 import { getPool } from "@/lib/db/postgres";
-import { MediaAssetType } from "@/lib/db/types";
+import { MediaAssetStatus, MediaAssetType } from "@/lib/db/types";
 import { initializePool } from "@/lib/db/postgres";
-
-// let isDatabasePoolInitialized = false;
-
-// (async () => {
-//   console.log(`isDatabasePoolInitialized=${isDatabasePoolInitialized}`);
-//   if (!isDatabasePoolInitialized) {
-//     await initializePool();
-//     isDatabasePoolInitialized = true;
-//   }
-// })();
 
 interface AddMediaAssetProps {
   id: string;
@@ -26,7 +16,7 @@ export async function addMediaAsset(args: AddMediaAssetProps) {
   const { id, title, assetType, url, prompt, thumbnail, metadata } = args;
   const { pool } = getPool();
   const query =
-    "INSERT INTO media_assets (id, title, asset_type, url, prompt, thumbnail, metadata, archived) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
+    "INSERT INTO media_assets (id, title, asset_type, url, prompt, thumbnail, metadata, archived, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)";
   const values = [
     id,
     title,
@@ -36,6 +26,7 @@ export async function addMediaAsset(args: AddMediaAssetProps) {
     thumbnail,
     metadata,
     false,
+    MediaAssetStatus.PENDING,
   ];
   try {
     const res = await pool.query(query, values);
@@ -44,6 +35,41 @@ export async function addMediaAsset(args: AddMediaAssetProps) {
     return id;
   } catch (err) {
     console.error("Error inserting media asset:", err);
+    throw err;
+  }
+}
+
+export async function getMediaAsset(mediaAssetID: string) {
+  await initializePool();
+  const { pool } = getPool();
+  const query = "SELECT * FROM media_assets WHERE id = $1";
+  const values = [mediaAssetID];
+  console.log(`getMediaAsset: ${mediaAssetID}`);
+  console.log(query);
+  try {
+    const res = await pool.query(query, values);
+    const mediaAsset = res.rows[0];
+    console.log(`--- mediaAsset ---`);
+    console.log(mediaAsset);
+    if (!mediaAsset) {
+      return null;
+    }
+
+    return {
+      id: mediaAsset.id,
+      title: mediaAsset.title,
+      assetType: mediaAsset.asset_type,
+      url: mediaAsset.url,
+      prompt: mediaAsset.prompt,
+      thumbnail: mediaAsset.thumbnail,
+      metadata: mediaAsset.metadata,
+      archived: mediaAsset.archived,
+      createdAt: mediaAsset.created_at,
+      updatedAt: mediaAsset.updated_at,
+      status: mediaAsset.status,
+    };
+  } catch (err) {
+    console.error("Error fetching media asset:", err);
     throw err;
   }
 }

@@ -14,6 +14,17 @@ export type Scalars = {
   Float: number;
 };
 
+export type AssetType =
+  | 'AUDIO'
+  | 'IMAGE'
+  | 'VIDEO';
+
+export type ClipResult = {
+  __typename: 'ClipResult';
+  id: Scalars['ID'];
+  url: Scalars['String'];
+};
+
 export type DemoItem = {
   __typename: 'DemoItem';
   message: Scalars['String'];
@@ -27,11 +38,13 @@ export type Mascot = {
 
 export type Media = {
   __typename: 'Media';
+  assetType: AssetType;
   id: Scalars['ID'];
   notes?: Maybe<Scalars['String']>;
   status: MediaStatus;
   thumbnail: Scalars['String'];
   title: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export type MediaStatus =
@@ -42,8 +55,8 @@ export type MediaStatus =
 
 export type Mutation = {
   __typename: 'Mutation';
+  clipVideo?: Maybe<ClipResult>;
   createMascot: Mascot;
-  createVideoTrim?: Maybe<Media>;
   deleteMedia?: Maybe<Media>;
   extractVideo?: Maybe<Array<Scalars['String']>>;
   updateMedia?: Maybe<Media>;
@@ -51,15 +64,16 @@ export type Mutation = {
 };
 
 
-export type MutationCreateMascotArgs = {
-  name: Scalars['String'];
-};
-
-
-export type MutationCreateVideoTrimArgs = {
+export type MutationClipVideoArgs = {
   endTime: Scalars['Float'];
   id: Scalars['ID'];
   startTime: Scalars['Float'];
+  url: Scalars['String'];
+};
+
+
+export type MutationCreateMascotArgs = {
+  name: Scalars['String'];
 };
 
 
@@ -186,11 +200,13 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  DemoItem: ResolverTypeWrapper<DemoItem>;
+  AssetType: AssetType;
+  ClipResult: ResolverTypeWrapper<ClipResult>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  DemoItem: ResolverTypeWrapper<DemoItem>;
   Mascot: ResolverTypeWrapper<Mascot>;
   Media: ResolverTypeWrapper<Media>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   MediaStatus: MediaStatus;
   Mutation: ResolverTypeWrapper<{}>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
@@ -202,16 +218,23 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  DemoItem: DemoItem;
+  ClipResult: ClipResult;
+  ID: Scalars['ID'];
   String: Scalars['String'];
+  DemoItem: DemoItem;
   Mascot: Mascot;
   Media: Media;
-  ID: Scalars['ID'];
   Mutation: {};
   Float: Scalars['Float'];
   Query: {};
   Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
+};
+
+export type ClipResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClipResult'] = ResolversParentTypes['ClipResult']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type DemoItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['DemoItem'] = ResolversParentTypes['DemoItem']> = {
@@ -226,17 +249,19 @@ export type MascotResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type MediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Media'] = ResolversParentTypes['Media']> = {
+  assetType?: Resolver<ResolversTypes['AssetType'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['MediaStatus'], ParentType, ContextType>;
   thumbnail?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  clipVideo?: Resolver<Maybe<ResolversTypes['ClipResult']>, ParentType, ContextType, RequireFields<MutationClipVideoArgs, 'endTime' | 'id' | 'startTime' | 'url'>>;
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
-  createVideoTrim?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationCreateVideoTrimArgs, 'endTime' | 'id' | 'startTime'>>;
   deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
   extractVideo?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
   updateMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
@@ -250,6 +275,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type Resolvers<ContextType = any> = {
+  ClipResult?: ClipResultResolvers<ContextType>;
   DemoItem?: DemoItemResolvers<ContextType>;
   Mascot?: MascotResolvers<ContextType>;
   Media?: MediaResolvers<ContextType>;

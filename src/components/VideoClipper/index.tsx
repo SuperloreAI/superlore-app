@@ -1,19 +1,39 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "tailwindcss/tailwind.css";
 import noUiSlider from "nouislider";
 import { formatTime } from "@/lib/helpers/time";
-import { Divider, Input } from "antd";
+import { Button, Divider, Input, Space, notification } from "antd";
+import { Query } from "@/lib/graphql/types/types.generated";
+import { gql, useMutation } from "@apollo/client";
+import Link from "next/link";
+import { clipVideo } from "../../lib/graphql/types/assets/resolvers/Mutation/clipVideo";
 
-const videoUrl =
-  "https://firebasestorage.googleapis.com/v0/b/superlore-dev.appspot.com/o/users%2F5t5JKBpETXdIoNM2wfLsfNsM5m33%2Fvideos%2Fab1a20ad-ca55-4b48-8487-969289cc3da8%2Fall-about-him.mp4?alt=media&token=27d5cfcb-5f5f-4047-b433-932be8d6e2a4";
+export const CLIP_VIDEO = gql`
+  mutation ClipVideo(
+    $id: ID!
+    $startTime: Float!
+    $endTime: Float!
+    $url: String!
+  ) {
+    clipVideo(id: $id, startTime: $startTime, endTime: $endTime, url: $url) {
+      id
+      url
+    }
+  }
+`;
 
-const VideoClipper: React.FC = () => {
-  const [clipTitle, setClipTitle] = useState("");
+interface VideoClipperProps {
+  mediaAsset: Query["getMedia"];
+}
+
+const VideoClipper: React.FC<VideoClipperProps> = ({ mediaAsset }) => {
+  const [clipTitle, setClipTitle] = useState(`Clip of ${mediaAsset?.title}`);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(10);
   const [videoDuration, setVideoDuration] = useState(0);
   const sliderContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -21,6 +41,8 @@ const VideoClipper: React.FC = () => {
 
     const onLoadedMetadata = () => {
       setVideoDuration(video.duration);
+      const halfDuration = video.duration / 2;
+      setEndTime(halfDuration);
       video.pause(); // Pause video when it's loaded
     };
 
@@ -34,7 +56,7 @@ const VideoClipper: React.FC = () => {
   useEffect(() => {
     if (sliderContainerRef.current) {
       const slider = noUiSlider.create(sliderContainerRef.current, {
-        start: [0, 10],
+        start: [startTime, endTime],
         connect: true,
         range: {
           min: 0,
@@ -76,20 +98,54 @@ const VideoClipper: React.FC = () => {
     };
   }, [startTime, endTime]);
 
-  const clipVideo = async () => {
-    try {
-      const response = await fetch("https://your-backend-server.com/clip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          start: startTime,
-          end: endTime,
-          videoUrl,
-        }),
-      });
+  const [clipVideoMutation] = useMutation(CLIP_VIDEO);
 
-      if (response.ok) {
+  const openNotification = useCallback(
+    (path: string, downloadUrl: string) => {
+      const key = `open-${path}`;
+      const btn = (
+        <Space>
+          <a href={downloadUrl} download target="_blank">
+            <Button size="small">Download</Button>
+          </a>
+          <Link href={path} target="_blank">
+            <Button type="primary" size="small">
+              View Asset
+            </Button>
+          </Link>
+        </Space>
+      );
+      api.open({
+        message: "Media Clipped!",
+        description: "The media has been added to your asset library",
+        btn,
+        key,
+      });
+    },
+    [api]
+  );
+
+  const clipVideo = async () => {
+    if (!mediaAsset || !mediaAsset.url) {
+      throw new Error("No media asset found");
+      return;
+    }
+    try {
+      console.log(`mediaAsset.url=${mediaAsset.url}`);
+      const response = await clipVideoMutation({
+        variables: {
+          id: mediaAsset.id,
+          startTime,
+          endTime,
+          url: mediaAsset.url,
+        },
+      });
+      console.log(response);
+      if (response.data && response.data.clipVideo) {
+        const clippedVideoResult = response.data.clipVideo;
         console.log("Video clipped successfully");
+        const id = clippedVideoResult.id;
+        openNotification(`/assets/media/${id}`, clippedVideoResult.url);
       } else {
         console.error("Failed to clip video");
       }
@@ -100,8 +156,12 @@ const VideoClipper: React.FC = () => {
 
   const duration = endTime - startTime;
 
+  if (!mediaAsset || !mediaAsset.url)
+    return <p>Loading... no media asset found yet</p>;
+
   return (
     <section>
+      {contextHolder}
       <Divider></Divider>
       <h3 style={{ width: "100%", textAlign: "center" }}>
         Clip Video from URL
@@ -110,7 +170,7 @@ const VideoClipper: React.FC = () => {
       <div style={{ maxWidth: "700px", display: "flex", flexDirection: "row" }}>
         <video
           ref={videoRef}
-          src={videoUrl}
+          src={mediaAsset.url}
           controls
           className="mb-4"
           style={{ width: "300px", height: "auto" }}

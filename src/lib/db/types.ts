@@ -11,7 +11,13 @@ export type StaffID = string & {
 };
 
 export enum MediaAssetType {
-  image = "image",
-  video = "video",
-  audio = "audio",
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  AUDIO = "AUDIO",
+}
+
+export enum MediaAssetStatus {
+  PENDING = "PENDING",
+  READY = "READY",
+  FAILED = "FAILED",
 }

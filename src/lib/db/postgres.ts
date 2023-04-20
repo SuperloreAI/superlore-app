@@ -39,21 +39,21 @@ import getPostgresConfig from "@/lib/db/config";
 //   return { pool, client };
 // };
 
-// export const createDatabase = async () => {
-//   const { pool } = getPool();
-//   try {
-//     // Update the path to your .sql file
-//     const sqlFilePath = path.join(__dirname, "./schema.sql");
-//     const schemaSql = fs.readFileSync(sqlFilePath, "utf-8");
+export const createDatabase = async () => {
+  const { pool } = getPool();
+  try {
+    // Update the path to your .sql file
+    const sqlFilePath = path.join(__dirname, "./schema.sql");
+    const schemaSql = fs.readFileSync(sqlFilePath, "utf-8");
 
-//     await pool.query(schemaSql);
-//     console.log("Schema created successfully");
-//   } catch (error) {
-//     console.error("Error creating schema:", error);
-//   } finally {
-//     pool.end();
-//   }
-// };
+    await pool.query(schemaSql);
+    console.log("Schema created successfully");
+  } catch (error) {
+    console.error("Error creating schema:", error);
+  } finally {
+    pool.end();
+  }
+};
 
 // export const migrateDatabase = async (migrationFileName: string) => {
 //   const { pool } = getPool();

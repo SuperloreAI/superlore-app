@@ -25,8 +25,10 @@ const FullScreenLayout = ({ children }: FullScreenLayoutProps) => {
           minHeight: "100%",
           width: "100%",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           backgroundColor: "white",
+          overflowY: "scroll",
+          padding: "30px",
         }}
       >
         {children}

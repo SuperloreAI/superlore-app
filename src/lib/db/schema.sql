@@ -55,6 +55,8 @@ CREATE TABLE media_assets (
     title TEXT NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
     url VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    notes TEXT,
     prompt TEXT,
     thumbnail TEXT,
     metadata JSONB,

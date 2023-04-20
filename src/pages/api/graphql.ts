@@ -4,9 +4,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { typeDefs } from "@/lib/graphql/types/typeDefs.generated";
 import {
   MutationExtractVideoArgs,
+  QueryGetMediaArgs,
   VideoType,
 } from "@/lib/graphql/types/types.generated";
-import { extractVideoGraphQL } from "@/lib/asset-library/extract-video";
+import {
+  clipVideo,
+  extractVideoGQL,
+  getMediaAssetGQL,
+} from "@/lib/graphql/schemas/assets/extract-video";
 
 interface CustomContext {
   req: NextApiRequest;
@@ -28,6 +33,12 @@ const resolvers = {
       _context: CustomContext,
       _info: any
     ) => `Greetings! You said ${args.input}`,
+    getMedia: (
+      _parent: any,
+      args: QueryGetMediaArgs,
+      _context: CustomContext,
+      _info: any
+    ) => getMediaAssetGQL(args),
   },
   Mutation: {
     createMascot: (
@@ -45,9 +56,22 @@ const resolvers = {
       _context: CustomContext,
       _info: any
     ) => {
-      console.log(`---- extractVideoGraphQL ----`);
-      const ids = extractVideoGraphQL(args);
+      console.log(`---- extractVideoGQL ----`);
+      const ids = extractVideoGQL(args);
       return ids;
+    },
+    clipVideo: async (
+      _: any,
+      {
+        id,
+        startTime,
+        endTime,
+        url,
+      }: { id: string; startTime: number; endTime: number; url: string }
+    ) => {
+      console.log(`from GQL url=${url}`);
+      const clippedVideoData = await clipVideo({ id, startTime, endTime, url });
+      return clippedVideoData;
     },
   },
 };

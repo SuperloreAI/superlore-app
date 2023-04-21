@@ -4,6 +4,7 @@ import "@/lib/secrets/secrets";
 import type {
   AudioMetadata,
   MediaUpdateInterchangeVideoClip,
+  MediaUpdateInterchangeVideoCreate,
   VideoMetadata,
 } from "@superlore/helpers/dist/types/asset-interchange.d.ts";
 import { PrismaClient, Prisma } from "@prisma/client";
@@ -12,7 +13,12 @@ import { MediaAssetStatus } from "@/lib/db/types";
 const prisma = new PrismaClient();
 
 interface NextApiRequestUpdateAsset extends NextApiRequest {
-  body: MediaUpdateInterchangeVideoClip;
+  body: MediaUpdateInterchangeVideoCreate | MediaUpdateInterchangeVideoClip;
+}
+function isMediaUpdateInterchangeVideoCreate(
+  obj: any
+): obj is MediaUpdateInterchangeVideoCreate {
+  return "title" in obj;
 }
 export default async function handler(
   req: NextApiRequestUpdateAsset,
@@ -20,15 +26,20 @@ export default async function handler(
 ) {
   const { id, thumbnail, metadata } = req.body;
   try {
+    const data = {
+      thumbnail,
+      status: MediaAssetStatus.READY,
+      metadata: metadata as Prisma.JsonObject,
+    };
+    if (isMediaUpdateInterchangeVideoCreate(req.body)) {
+      const { title, notes } = req.body;
+      // @ts-ignore
+      if (title) data.title = title;
+    }
     const updatedMediaAsset = await prisma.media_assets.update({
       where: { id },
-      data: {
-        thumbnail,
-        status: MediaAssetStatus.READY,
-        metadata: metadata as Prisma.JsonObject,
-      },
+      data,
     });
-    console.log(updatedMediaAsset);
     res.status(200).json(updatedMediaAsset);
   } catch (error) {
     console.error("Error updating media asset:", error);

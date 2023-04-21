@@ -24,11 +24,7 @@ const CompleteLogin: React.FC<Props> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const completeLogin = useCallback(async () => {
-    console.log("completing login...");
-    console.log(email);
-    console.log(submitted);
     if (email && submitted) {
-      console.log("trying...");
       setLoading(true);
       try {
         const emailLink = window.location.href;

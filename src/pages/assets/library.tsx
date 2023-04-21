@@ -120,8 +120,6 @@ export const getServerSideProps = async () => {
       cursorStart: "",
     },
   });
-  console.log(`data----`);
-  console.log(data);
   const { listMedia } = data;
 
   return {

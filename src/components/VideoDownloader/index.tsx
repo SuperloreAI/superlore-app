@@ -67,6 +67,7 @@ const VideoDownloaderComponent: React.FC<VideoDownloaderComponentProps> = ({
         description: "The media has been added to your asset library",
         btn,
         key,
+        duration: null,
       });
     },
     [api]

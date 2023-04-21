@@ -24,6 +24,8 @@ const nextConfig = {
       "/assets/library": { page: "/assets/library" },
       "/assets/media/[mediaID]": { page: "/assets/media/[mediaID]" },
       "/assets/clipper/[mediaID]": { page: "/assets/clipper/[mediaID]" },
+      "/videos/history": { page: "/videos/history" },
+      "/videos/create": { page: "/videos/create" },
     };
   },
 };

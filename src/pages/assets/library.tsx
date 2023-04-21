@@ -30,7 +30,7 @@ const AssetLibraryPage: NextPage<AssetLibraryPageProps> = ({
   }
   return (
     <FullScreenLayout>
-      <div style={{ overflowY: "scroll", padding: "20px" }}>
+      <div style={{ padding: "20px" }}>
         <div
           style={{
             display: "flex",

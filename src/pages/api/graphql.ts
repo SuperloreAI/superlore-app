@@ -14,6 +14,7 @@ import {
   listMedia,
   updateMediaAsset,
 } from "@/lib/graphql/schemas/assets/extract-video";
+import { listVideos } from "@/lib/graphql/schemas/videos/operations";
 
 interface CustomContext {
   req: NextApiRequest;
@@ -47,6 +48,12 @@ const resolvers = {
       _context: CustomContext,
       _info: any
     ) => listMedia(args.searchString, args.limit, args.cursorStart),
+    listVideos: (
+      _parent: any,
+      args: { searchString: string; limit: number; cursorStart: string },
+      _context: CustomContext,
+      _info: any
+    ) => listVideos(args.searchString, args.limit, args.cursorStart),
   },
   Mutation: {
     createMascot: (

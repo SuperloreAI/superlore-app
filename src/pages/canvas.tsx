@@ -3,21 +3,22 @@ import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import { NextPage } from "next";
 import ChatVideoBlock from "@/components/ChatVideoBlock";
 import Link from "next/link";
+import FullScreenLayout from "@/components/FullScreenLayout";
+import { Input } from "antd";
 
 interface CanvasPageProps {
   message: string;
 }
 const CanvasPage: NextPage<CanvasPageProps> = ({ message }) => {
   return (
-    <div id="canvas-page" className="min-h-screen bg-gray-100">
+    <FullScreenLayout>
       <div
         id="static-control-bar"
         className="flex justify-between items-center bg-gray-800 text-white p-4"
+        style={{ width: "100%" }}
       >
         <div className="font-bold">
-          <Link href="/">
-            <b>Superlore</b>
-          </Link>
+          <Input value="Video Title" />
         </div>
         <div className="row-of-options flex space-x-4">
           <p className="cursor-pointer">Save</p>
@@ -34,7 +35,7 @@ const CanvasPage: NextPage<CanvasPageProps> = ({ message }) => {
         <ChatVideoBlock />
         <ChatVideoBlock />
       </div>
-    </div>
+    </FullScreenLayout>
   );
 };
 

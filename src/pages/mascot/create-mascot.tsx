@@ -35,7 +35,7 @@ const CREATE_MASCOT_MUTATION = gql`
 
 const CreateMascot: NextPage<CreateMascotProps> = ({ firebaseConfig }) => {
   const apolloClient = useApolloClient();
-  console.log(firebaseConfig);
+
   const { user, loading } = useFirebase();
 
   const [name, setName] = useState("");

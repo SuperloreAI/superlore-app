@@ -11,8 +11,6 @@ interface GuardedDemoPageProps {
 }
 
 const GuardedDemoPage = ({ firebaseConfig }: GuardedDemoPageProps) => {
-  console.log(`firebaseConfig`);
-  console.log(firebaseConfig);
   const router = useRouter();
   const { user, loading } = useFirebase();
   // Redirect unauthenticated users to the login page

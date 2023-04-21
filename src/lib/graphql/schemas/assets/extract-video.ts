@@ -3,7 +3,7 @@ import axios from "axios";
 import {
   placeholderAudioThumbnail,
   placeholderVideoThumbnail,
-} from "@/lib/constants";
+} from "@superlore/helpers";
 import { getPool } from "@/lib/db/postgres";
 import { MediaAssetStatus, MediaAssetType } from "@/lib/db/types";
 import { initializePool } from "@/lib/db/postgres";
@@ -83,22 +83,39 @@ export async function getMediaAsset(mediaAssetID: string) {
 export const extractVideoGQL = async (args: MutationExtractVideoArgs) => {
   const mediaManipulationServer = process.env.MEDIA_MANIPULATION_ENDPOINT;
   if (args.type === "YOUTUBE") {
-    const endpoint = `${mediaManipulationServer}/extractor/youtube/video`;
-    const response = await axios.post(endpoint, {
+    const endpointVideo = `${mediaManipulationServer}/extractor/youtube/video`;
+    const responseVideo = await axios.post(endpointVideo, {
       url: args.url,
     });
-    const { url, id } = response.data;
+    const endpointAudio = `${mediaManipulationServer}/extractor/youtube/audio`;
+    const responseAudio = await axios.post(endpointAudio, {
+      url: args.url,
+    });
+    const { url: urlVideo, id: idVideo } = responseVideo.data;
+    const { url: urlAudio, id: idAudio } = responseAudio.data;
     const video = {
-      id,
-      title: `Video ${id}`,
+      id: idVideo,
+      title: `Video ${idVideo}`,
       assetType: MediaAssetType.VIDEO,
-      url,
+      url: urlVideo,
       prompt: "",
       thumbnail: placeholderVideoThumbnail,
       metadata: {},
     };
-    const mediaAssetID = await addMediaAsset(video);
-    return [mediaAssetID];
+    const audio = {
+      id: idAudio,
+      title: `Audio ${idAudio}`,
+      assetType: MediaAssetType.AUDIO,
+      url: urlAudio,
+      prompt: "",
+      thumbnail: placeholderAudioThumbnail,
+      metadata: {},
+    };
+    const [mediaAssetIDVideo, mediaAssetIDAudio] = await Promise.all([
+      addMediaAsset(video),
+      addMediaAsset(audio),
+    ]);
+    return [mediaAssetIDVideo, mediaAssetIDAudio];
   } else if (args.type === "TIKTOK") {
     const endpoint = `${mediaManipulationServer}/extractor/tiktok/video`;
     const response = await axios.post(endpoint, {

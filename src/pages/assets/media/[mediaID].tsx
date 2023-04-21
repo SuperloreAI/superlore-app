@@ -98,7 +98,6 @@ const MediaAssetPage: NextPage<MediaAssetPageProps> = ({ mediaAsset }) => {
     }
   };
 
-  console.log(mediaAsset);
   return (
     <FullScreenLayout>
       {contextHolder}
@@ -171,10 +170,9 @@ export const getServerSideProps = async (
     uri: GRAPHQL_ENDPOINT,
     cache: new InMemoryCache(),
   });
-  console.log(context);
+
   const mediaAssetID = context.params?.mediaID;
 
-  console.log(`mediaAssetID = ${mediaAssetID}`);
   // Ensure mediaAssetID is a string, otherwise return a 404 error
   if (typeof mediaAssetID !== "string") {
     return {
@@ -190,7 +188,7 @@ export const getServerSideProps = async (
       id: mediaAssetID,
     },
   });
-  console.log(data);
+
   const { getMedia } = data;
 
   return {

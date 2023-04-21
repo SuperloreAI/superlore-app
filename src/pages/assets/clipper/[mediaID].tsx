@@ -68,7 +68,6 @@ export const getServerSideProps = async (
   });
   const mediaAssetID = context.params?.mediaID;
 
-  console.log(`mediaAssetID = ${mediaAssetID}`);
   // Ensure mediaAssetID is a string, otherwise return a 404 error
   if (typeof mediaAssetID !== "string") {
     return {
@@ -96,7 +95,7 @@ export const getServerSideProps = async (
       id: mediaAssetID,
     },
   });
-  console.log(data);
+
   const { getMedia } = data;
 
   return {

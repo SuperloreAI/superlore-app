@@ -28,7 +28,6 @@ const FullScreenLayout = ({ children }: FullScreenLayoutProps) => {
           justifyContent: "flex-start",
           backgroundColor: "white",
           overflowY: "scroll",
-          padding: "30px",
         }}
       >
         {children}

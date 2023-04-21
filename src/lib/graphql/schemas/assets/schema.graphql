@@ -3,6 +3,8 @@ type Query {
   getMedia(id: ID!): Media
 }
 
+
+
 type Mutation {
   uploadMedia(url: String!, title: String!, notes: String): Media
   deleteMedia(id: ID!): Media

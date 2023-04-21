@@ -13,15 +13,15 @@ const menuItems = [
   { id: "1", text: "Create Video", destination: "/canvas", disabled: false },
   {
     id: "2",
-    text: "Asset Library",
-    destination: "/assets/library",
+    text: "Video History",
+    destination: "/videos/history",
     disabled: false,
   },
   {
     id: "3",
-    text: "Video History",
-    destination: "/",
-    disabled: true,
+    text: "Asset Library",
+    destination: "/assets/library",
+    disabled: false,
   },
   {
     id: "4",

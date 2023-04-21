@@ -15,9 +15,11 @@ import    { uploadMedia as Mutation_uploadMedia } from './assets/resolvers/Mutat
 import    { getMedia as Query_getMedia } from './assets/resolvers/Query/getMedia';
 import    { greetings as Query_greetings } from './demo/resolvers/Query/greetings';
 import    { listMedia as Query_listMedia } from './assets/resolvers/Query/listMedia';
+import    { listVideos as Query_listVideos } from './videos/resolvers/Query/listVideos';
+import    { Video } from './videos/resolvers/Video';
 import    { VideoMetadata } from './assets/resolvers/VideoMetadata';
     export const resolvers: Resolvers = {
-      Query: { getMedia: Query_getMedia,greetings: Query_greetings,listMedia: Query_listMedia },
+      Query: { getMedia: Query_getMedia,greetings: Query_greetings,listMedia: Query_listMedia,listVideos: Query_listVideos },
       Mutation: { clipVideo: Mutation_clipVideo,createMascot: Mutation_createMascot,deleteMedia: Mutation_deleteMedia,extractVideo: Mutation_extractVideo,updateMedia: Mutation_updateMedia,uploadMedia: Mutation_uploadMedia },
       
       AudioMetadata: AudioMetadata,
@@ -26,5 +28,6 @@ DemoItem: DemoItem,
 Mascot: Mascot,
 Media: Media,
 MediaMetadata: MediaMetadata,
+Video: Video,
 VideoMetadata: VideoMetadata
     }

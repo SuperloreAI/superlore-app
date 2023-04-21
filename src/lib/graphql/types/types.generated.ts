@@ -117,6 +117,7 @@ export type Query = {
   getMedia?: Maybe<Media>;
   greetings: Scalars['String'];
   listMedia?: Maybe<Array<Maybe<Media>>>;
+  listVideos?: Maybe<Array<Maybe<Video>>>;
 };
 
 
@@ -134,6 +135,29 @@ export type QueryListMediaArgs = {
   cursorStart?: InputMaybe<Scalars['String']>;
   limit?: InputMaybe<Scalars['Int']>;
   searchString?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryListVideosArgs = {
+  cursorStart?: InputMaybe<Scalars['String']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  searchString?: InputMaybe<Scalars['String']>;
+};
+
+export type Video = {
+  __typename: 'Video';
+  archived: Scalars['Boolean'];
+  createdAt: Scalars['String'];
+  id: Scalars['ID'];
+  metadata?: Maybe<VideoMetadata>;
+  notes?: Maybe<Scalars['String']>;
+  primaryMascotId?: Maybe<Scalars['ID']>;
+  prompt?: Maybe<Scalars['String']>;
+  status: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
+  title: Scalars['String'];
+  updatedAt: Scalars['String'];
+  url?: Maybe<Scalars['String']>;
 };
 
 export type VideoMetadata = {
@@ -245,9 +269,10 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  Video: ResolverTypeWrapper<Video>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   VideoMetadata: ResolverTypeWrapper<VideoMetadata>;
   VideoType: VideoType;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -264,8 +289,9 @@ export type ResolversParentTypes = {
   Mutation: {};
   Query: {};
   Int: Scalars['Int'];
-  VideoMetadata: VideoMetadata;
+  Video: Video;
   Boolean: Scalars['Boolean'];
+  VideoMetadata: VideoMetadata;
 };
 
 export type AudioMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['AudioMetadata'] = ResolversParentTypes['AudioMetadata']> = {
@@ -321,6 +347,23 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<QueryGetMediaArgs, 'id'>>;
   greetings?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryGreetingsArgs, 'input'>>;
   listMedia?: Resolver<Maybe<Array<Maybe<ResolversTypes['Media']>>>, ParentType, ContextType, Partial<QueryListMediaArgs>>;
+  listVideos?: Resolver<Maybe<Array<Maybe<ResolversTypes['Video']>>>, ParentType, ContextType, Partial<QueryListVideosArgs>>;
+};
+
+export type VideoResolvers<ContextType = any, ParentType extends ResolversParentTypes['Video'] = ResolversParentTypes['Video']> = {
+  archived?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  metadata?: Resolver<Maybe<ResolversTypes['VideoMetadata']>, ParentType, ContextType>;
+  notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  primaryMascotId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  prompt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  thumbnail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type VideoMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['VideoMetadata'] = ResolversParentTypes['VideoMetadata']> = {
@@ -344,6 +387,7 @@ export type Resolvers<ContextType = any> = {
   MediaMetadata?: MediaMetadataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Video?: VideoResolvers<ContextType>;
   VideoMetadata?: VideoMetadataResolvers<ContextType>;
 };
 

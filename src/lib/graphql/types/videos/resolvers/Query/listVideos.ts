@@ -1,0 +1,2 @@
+import type   { QueryResolvers } from './../../../types.generated';
+        export const listVideos: NonNullable<QueryResolvers['listVideos']> = async (_parent, _arg, _ctx) => { /* Implement Query.listVideos resolver logic here */ };

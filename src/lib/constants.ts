@@ -10,3 +10,8 @@ export const firebaseConfigSecret = {
   secretId: "FirebaseConfig",
   versionId: "latest",
 };
+
+export const huggingFaceSecret = {
+  secretId: "hugging_face",
+  versionId: "latest",
+};

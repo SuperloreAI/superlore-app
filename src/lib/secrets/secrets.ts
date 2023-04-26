@@ -4,6 +4,7 @@ import {
   projectId,
   postgresDevSecret,
   firebaseConfigSecret,
+  huggingFaceSecret,
 } from "@/lib/constants";
 import dotenv from "dotenv";
 dotenv.config();
@@ -73,4 +74,13 @@ export const getFirebaseConfig = async () => {
     firebaseConfigSecret.versionId
   );
   return JSON.parse(firebaseConfig) as FirebaseConfig;
+};
+
+export const getHuggingFaceAPI = (): Promise<SecretKey> => {
+  // Get the secret value
+  return accessSecretVersion(
+    projectId,
+    huggingFaceSecret.secretId,
+    huggingFaceSecret.versionId
+  ) as Promise<SecretKey>;
 };

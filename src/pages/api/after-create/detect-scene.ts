@@ -10,8 +10,9 @@ import type {
 import { PrismaClient, Prisma } from "@prisma/client";
 import { MediaAssetStatus, MediaAssetType } from "@/lib/db/types";
 import { SceneDetectBatchBody } from "@/lib/types/scene-detect";
-import { encodeImageToBase64, tokenizeImageWithCLIP } from "@/lib/ai/clip-vit";
+import { encodeImageToBase64, tokenizeWithCLIP } from "@/lib/ai/clip-vit";
 import { v4 as uuid } from "uuid";
+import { saveToPinecone } from "@/lib/ai/pinecone";
 
 const prisma = new PrismaClient();
 
@@ -42,7 +43,7 @@ export default async function handler(
         });
       } else {
         groupedScenes[scene.scene_asset_id] = {
-          sceneID: uuid(), // scene.scene_asset_id,
+          sceneID: scene.scene_asset_id,
           sceneVideo: scene.scene_url,
           frames: [{ id: scene.frame_asset_id, url: scene.frame_url }],
           originalVideo: {
@@ -55,7 +56,7 @@ export default async function handler(
     // save to postgres
     const updatedMediaAsset = await prisma.media_assets.createMany({
       data: Object.values(groupedScenes).map((gs) => ({
-        id: gs.sceneID,
+        id: uuid(), // gs.sceneID,
         title: `Scene ${gs.sceneID} from original video ${title} id=${gs.originalVideo.id}`,
         asset_type: MediaAssetType.VIDEO,
         url: gs.sceneVideo,
@@ -71,10 +72,22 @@ export default async function handler(
         const thumbnails = await Promise.all(
           frame.frames.map((f) => encodeImageToBase64(f.url))
         );
-        const vectors = tokenizeImageWithCLIP({
+        const vectors = await tokenizeWithCLIP({
           text_list: [],
           image_list: thumbnails,
         });
+        const { image_features } = vectors;
+        const upsetVectors = frame.frames.map((f, idx) => {
+          const kbbqData = {
+            id: f.id,
+            values: image_features[idx],
+            metadata: {
+              scene_id: frame.sceneID,
+            },
+          };
+          return kbbqData;
+        });
+        await saveToPinecone(upsetVectors);
       })
     );
 

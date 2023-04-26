@@ -1,6 +1,7 @@
 import axios from "axios";
 import fetch from "node-fetch";
 import { getHuggingFaceAPI } from "@/lib/secrets/secrets";
+import { CLIPEmbeddingResponse } from "@/lib/types/base.types";
 
 type Base64ImgStr = string;
 interface CLIPInput {
@@ -8,9 +9,9 @@ interface CLIPInput {
   image_list: Base64ImgStr[];
 }
 
-export const tokenizeTextWithCLIP = async () => {};
-
-export const tokenizeImageWithCLIP = async (inputs: CLIPInput) => {
+export const tokenizeWithCLIP = async (
+  inputs: CLIPInput
+): Promise<CLIPEmbeddingResponse> => {
   const hfToken = await getHuggingFaceAPI();
   const endpoint = `${process.env.CLIP_EMBEDDING_SERVER}`;
   try {
@@ -25,7 +26,7 @@ export const tokenizeImageWithCLIP = async (inputs: CLIPInput) => {
     });
     return data;
   } catch (e) {
-    console.log(e);
+    console.log((e as any).message);
     throw e;
   }
 };

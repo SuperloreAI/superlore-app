@@ -5,6 +5,7 @@ import {
   postgresDevSecret,
   firebaseConfigSecret,
   huggingFaceSecret,
+  pineconeSecret,
 } from "@/lib/constants";
 import dotenv from "dotenv";
 dotenv.config();
@@ -82,5 +83,14 @@ export const getHuggingFaceAPI = (): Promise<SecretKey> => {
     projectId,
     huggingFaceSecret.secretId,
     huggingFaceSecret.versionId
+  ) as Promise<SecretKey>;
+};
+
+export const getPineconeAPI = (): Promise<SecretKey> => {
+  // Get the secret value
+  return accessSecretVersion(
+    projectId,
+    pineconeSecret.secretId,
+    pineconeSecret.versionId
   ) as Promise<SecretKey>;
 };

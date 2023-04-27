@@ -66,9 +66,11 @@ export type MediaStatus =
 export type Mutation = {
   __typename: 'Mutation';
   clipVideo?: Maybe<ClipResult>;
+  compileVideoFromRaws: Scalars['String'];
   createMascot: Mascot;
   deleteMedia?: Maybe<Media>;
   extractVideo?: Maybe<Array<Scalars['String']>>;
+  generateScreenplay: ScreenPlay;
   updateMedia: Scalars['ID'];
   uploadMedia?: Maybe<Media>;
 };
@@ -80,6 +82,12 @@ export type MutationClipVideoArgs = {
   startTime: Scalars['Float'];
   title: Scalars['String'];
   url: Scalars['String'];
+};
+
+
+export type MutationCompileVideoFromRawsArgs = {
+  title: Scalars['String'];
+  urlOfRaws: Array<Scalars['String']>;
 };
 
 
@@ -96,6 +104,11 @@ export type MutationDeleteMediaArgs = {
 export type MutationExtractVideoArgs = {
   type: VideoType;
   url: Scalars['String'];
+};
+
+
+export type MutationGenerateScreenplayArgs = {
+  synopsis: Scalars['String'];
 };
 
 
@@ -142,6 +155,27 @@ export type QueryListVideosArgs = {
   cursorStart?: InputMaybe<Scalars['String']>;
   limit?: InputMaybe<Scalars['Int']>;
   searchString?: InputMaybe<Scalars['String']>;
+};
+
+export type ScreenPlay = {
+  __typename: 'ScreenPlay';
+  scenes?: Maybe<Array<ScreenPlayScene>>;
+  title: Scalars['String'];
+};
+
+export type ScreenPlayScene = {
+  __typename: 'ScreenPlayScene';
+  raws?: Maybe<Array<SuggestedRaw>>;
+  sid: Scalars['String'];
+  textOverlay?: Maybe<Scalars['String']>;
+  visualDescription: Scalars['String'];
+};
+
+export type SuggestedRaw = {
+  __typename: 'SuggestedRaw';
+  id: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
+  url: Scalars['String'];
 };
 
 export type Video = {
@@ -269,6 +303,9 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  ScreenPlay: ResolverTypeWrapper<ScreenPlay>;
+  ScreenPlayScene: ResolverTypeWrapper<ScreenPlayScene>;
+  SuggestedRaw: ResolverTypeWrapper<SuggestedRaw>;
   Video: ResolverTypeWrapper<Video>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   VideoMetadata: ResolverTypeWrapper<VideoMetadata>;
@@ -289,6 +326,9 @@ export type ResolversParentTypes = {
   Mutation: {};
   Query: {};
   Int: Scalars['Int'];
+  ScreenPlay: ScreenPlay;
+  ScreenPlayScene: ScreenPlayScene;
+  SuggestedRaw: SuggestedRaw;
   Video: Video;
   Boolean: Scalars['Boolean'];
   VideoMetadata: VideoMetadata;
@@ -336,9 +376,11 @@ export type MediaMetadataResolvers<ContextType = any, ParentType extends Resolve
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   clipVideo?: Resolver<Maybe<ResolversTypes['ClipResult']>, ParentType, ContextType, RequireFields<MutationClipVideoArgs, 'endTime' | 'id' | 'startTime' | 'title' | 'url'>>;
+  compileVideoFromRaws?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCompileVideoFromRawsArgs, 'title' | 'urlOfRaws'>>;
   createMascot?: Resolver<ResolversTypes['Mascot'], ParentType, ContextType, RequireFields<MutationCreateMascotArgs, 'name'>>;
   deleteMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationDeleteMediaArgs, 'id'>>;
   extractVideo?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType, RequireFields<MutationExtractVideoArgs, 'type' | 'url'>>;
+  generateScreenplay?: Resolver<ResolversTypes['ScreenPlay'], ParentType, ContextType, RequireFields<MutationGenerateScreenplayArgs, 'synopsis'>>;
   updateMedia?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationUpdateMediaArgs, 'id'>>;
   uploadMedia?: Resolver<Maybe<ResolversTypes['Media']>, ParentType, ContextType, RequireFields<MutationUploadMediaArgs, 'title' | 'url'>>;
 };
@@ -348,6 +390,27 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   greetings?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryGreetingsArgs, 'input'>>;
   listMedia?: Resolver<Maybe<Array<Maybe<ResolversTypes['Media']>>>, ParentType, ContextType, Partial<QueryListMediaArgs>>;
   listVideos?: Resolver<Maybe<Array<Maybe<ResolversTypes['Video']>>>, ParentType, ContextType, Partial<QueryListVideosArgs>>;
+};
+
+export type ScreenPlayResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScreenPlay'] = ResolversParentTypes['ScreenPlay']> = {
+  scenes?: Resolver<Maybe<Array<ResolversTypes['ScreenPlayScene']>>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ScreenPlaySceneResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScreenPlayScene'] = ResolversParentTypes['ScreenPlayScene']> = {
+  raws?: Resolver<Maybe<Array<ResolversTypes['SuggestedRaw']>>, ParentType, ContextType>;
+  sid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  textOverlay?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  visualDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SuggestedRawResolvers<ContextType = any, ParentType extends ResolversParentTypes['SuggestedRaw'] = ResolversParentTypes['SuggestedRaw']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  thumbnail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type VideoResolvers<ContextType = any, ParentType extends ResolversParentTypes['Video'] = ResolversParentTypes['Video']> = {
@@ -387,6 +450,9 @@ export type Resolvers<ContextType = any> = {
   MediaMetadata?: MediaMetadataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  ScreenPlay?: ScreenPlayResolvers<ContextType>;
+  ScreenPlayScene?: ScreenPlaySceneResolvers<ContextType>;
+  SuggestedRaw?: SuggestedRawResolvers<ContextType>;
   Video?: VideoResolvers<ContextType>;
   VideoMetadata?: VideoMetadataResolvers<ContextType>;
 };

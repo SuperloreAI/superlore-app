@@ -15,3 +15,10 @@ export const huggingFaceSecret = {
   secretId: "hugging_face",
   versionId: "latest",
 };
+
+export const pineconeSecret = {
+  secretId: "pinecone",
+  versionId: "latest",
+};
+export const pineconeIndex = "video-scenes-clip-vit-l-14";
+export const pineconeGenericKBBQClipsNamespace = "generic-kbbq-clips-test3";

@@ -4,6 +4,11 @@ type Query {
   listVideos(searchString: String, limit: Int, cursorStart: String): [Video]
 }
 
+type Mutation {
+  generateScreenplay(synopsis: String!): ScreenPlay!
+  compileVideoFromRaws(title: String!, urlOfRaws: [String!]!): String!
+}
+
 type Video {
   id: ID!
   title: String!
@@ -17,4 +22,22 @@ type Video {
   createdAt: String!
   updatedAt: String!
   metadata: VideoMetadata
+}
+
+type SuggestedRaw {
+  id: String!
+  url: String!
+  thumbnail: String
+}
+
+type ScreenPlayScene {
+  sid: String!
+  textOverlay: String
+  visualDescription: String!
+  raws: [SuggestedRaw!]
+}
+
+type ScreenPlay {
+  title: String!
+  scenes: [ScreenPlayScene!]
 }

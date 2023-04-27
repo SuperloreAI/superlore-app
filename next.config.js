@@ -26,6 +26,7 @@ const nextConfig = {
       "/assets/clipper/[mediaID]": { page: "/assets/clipper/[mediaID]" },
       "/videos/history": { page: "/videos/history" },
       "/videos/create": { page: "/videos/create" },
+      "/videos/screenplay": { page: "/videos/screenplay" },
     };
   },
 };

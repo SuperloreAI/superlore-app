@@ -10,7 +10,12 @@ export interface SideMenuItem {
 }
 
 const menuItems = [
-  { id: "1", text: "Create Video", destination: "/canvas", disabled: false },
+  {
+    id: "1",
+    text: "Create Video",
+    destination: "/videos/screenplay",
+    disabled: false,
+  },
   {
     id: "2",
     text: "Video History",

@@ -56,7 +56,7 @@ export default async function handler(
     // save to postgres
     const updatedMediaAsset = await prisma.media_assets.createMany({
       data: Object.values(groupedScenes).map((gs) => ({
-        id: uuid(), // gs.sceneID,
+        id: gs.sceneID,
         title: `Scene ${gs.sceneID} from original video ${title} id=${gs.originalVideo.id}`,
         asset_type: MediaAssetType.VIDEO,
         url: gs.sceneVideo,
@@ -68,21 +68,21 @@ export default async function handler(
     });
     // retreive vector embeddings
     await Promise.all(
-      Object.values(groupedScenes).map(async (frame) => {
+      Object.values(groupedScenes).map(async (scene) => {
         const thumbnails = await Promise.all(
-          frame.frames.map((f) => encodeImageToBase64(f.url))
+          scene.frames.map((f) => encodeImageToBase64(f.url))
         );
         const vectors = await tokenizeWithCLIP({
           text_list: [],
           image_list: thumbnails,
         });
         const { image_features } = vectors;
-        const upsetVectors = frame.frames.map((f, idx) => {
+        const upsetVectors = scene.frames.map((f, idx) => {
           const kbbqData = {
             id: f.id,
             values: image_features[idx],
             metadata: {
-              scene_id: frame.sceneID,
+              scene_id: scene.sceneID,
             },
           };
           return kbbqData;

@@ -1,20 +1,27 @@
 // Import React and CSS (optional)
-import React, { useEffect } from "react";
+import {
+  ScreenPlayScene,
+  SuggestedRaw,
+} from "@/lib/graphql/types/types.generated";
+import { placeholderVideoThumbnail } from "@superlore/helpers";
+import React, { useEffect, useState } from "react";
 import "tailwindcss/tailwind.css";
 
 // Define TypeScript interface for the component's props
 interface ChatVideoBlockProps {
-  someProp?: string;
+  scene: ScreenPlayScene;
+  addRaw: (raw: SuggestedRaw) => void;
 }
 
 // Create the functional component
-const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({
-  someProp = "default value",
-}) => {
+const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({ scene, addRaw }) => {
+  const [chosenRaw, setChosenRaw] = useState<SuggestedRaw>();
+  const { sid, textOverlay, visualDescription, raws } = scene;
   useEffect(() => {
-    // Add any side-effects or fetch data here
+    if (raws) {
+      setChosenRaw(raws[0]);
+    }
   }, []);
-
   return (
     <div className="bg-white shadow-md p-6 mb-4 rounded-lg w-full max-w-[1200px]">
       <div className="flex flex-col md:flex-row md:items-start justify-center md:space-x-4">
@@ -29,23 +36,36 @@ const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({
           <input
             className="text-xl font-semibold mb-4 w-full"
             defaultValue={`Scene #N`}
+            value={sid || ""}
           />
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded resize-none"
+            rows={2}
+            defaultValue="Lorem ipsum solar descartes"
+            value={textOverlay || ""}
+          ></textarea>
           <textarea
             className="w-full p-2 border border-gray-300 rounded resize-none"
             rows={6}
             defaultValue="Lorem ipsum solar descartes"
+            value={visualDescription || ""}
           ></textarea>
           <button
             id="primary-action"
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4 mr-2"
+            onClick={() => {
+              if (chosenRaw) {
+                addRaw(chosenRaw);
+              }
+            }}
           >
-            Generate Video
+            Add to Reel
           </button>
           <button
             id="secondary-ghost-action"
             className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded mt-4"
           >
-            Rewrite Text
+            Re-Generate
           </button>
         </section>
         <section
@@ -54,6 +74,7 @@ const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <video
+              src={chosenRaw?.url || ""}
               className="w-full rounded"
               controls
               style={{
@@ -66,26 +87,20 @@ const ChatVideoBlock: React.FC<ChatVideoBlockProps> = ({
               className="flex flex-wrap gap-2"
               style={{ maxWidth: "100px" }}
             >
-              <img
-                src="https://htmlcolorcodes.com/assets/images/colors/gray-color-solid-background-1920x1080.png"
-                alt="Small preview 1"
-                className="w-full rounded small-preview-in-column"
-              />
-              <img
-                src="https://htmlcolorcodes.com/assets/images/colors/gray-color-solid-background-1920x1080.png"
-                alt="Small preview 2"
-                className="w-full rounded small-preview-in-column"
-              />
-              <img
-                src="https://htmlcolorcodes.com/assets/images/colors/gray-color-solid-background-1920x1080.png"
-                alt="Small preview 3"
-                className="w-full rounded small-preview-in-column"
-              />
-              <img
-                src="https://htmlcolorcodes.com/assets/images/colors/gray-color-solid-background-1920x1080.png"
-                alt="Small preview 4"
-                className="w-full rounded small-preview-in-column"
-              />
+              {(raws || []).map((raw) => {
+                return (
+                  <img
+                    key={raw.id}
+                    src={raw.thumbnail || placeholderVideoThumbnail}
+                    alt="Small preview 2"
+                    className="w-full rounded small-preview-in-column"
+                    onClick={() => {
+                      console.log(raw);
+                      setChosenRaw(raw);
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </section>

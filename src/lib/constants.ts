@@ -21,4 +21,4 @@ export const pineconeSecret = {
   versionId: "latest",
 };
 export const pineconeIndex = "video-scenes-clip-vit-l-14";
-export const pineconeGenericKBBQClipsNamespace = "generic-kbbq-clips";
+export const pineconeGenericKBBQClipsNamespace = "generic-kbbq-clips-test3";

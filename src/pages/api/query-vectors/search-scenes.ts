@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// POST /api/query-vectors/search-scenes
 interface NextApiRequestQueryScenes extends NextApiRequest {
   body: {
     query: string;
@@ -24,8 +25,9 @@ export default async function handler(
   });
   const { text_features } = vectors;
   const queryRes = await queryPinecone(text_features[0]);
-  const scene_ids = queryRes.matches?.map((m) => m.id) || [];
-  console.log(scene_ids);
+  const scene_ids =
+    queryRes.matches?.map((m) => (m.metadata as any).scene_id) || [];
+  // console.log(scene_ids);
   const mediaAssets = await prisma.media_assets.findMany({
     where: {
       id: {
@@ -33,6 +35,6 @@ export default async function handler(
       },
     },
   });
-  console.log(mediaAssets);
+  // console.log(mediaAssets);
   res.status(200).json(mediaAssets);
 }

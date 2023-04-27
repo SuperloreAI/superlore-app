@@ -15,6 +15,7 @@ import {
   updateMediaAsset,
 } from "@/lib/graphql/schemas/assets/extract-video";
 import { listVideos } from "@/lib/graphql/schemas/videos/operations";
+import axios from "axios";
 
 interface CustomContext {
   req: NextApiRequest;
@@ -110,6 +111,62 @@ const resolvers = {
       const { id, title, notes } = args;
       const updatedMedia = await updateMediaAsset({ id, title, notes });
       return updatedMedia.id;
+    },
+    generateScreenplay: async (
+      _parent: any,
+      args: { synopsis: string },
+      _context: CustomContext,
+      _info: any
+    ) => {
+      const { synopsis } = args;
+      console.log(`About to hit it...`);
+      const server = process.env.MEDIA_MANIPULATION_ENDPOINT;
+      try {
+        const { data } = await axios({
+          method: "post",
+          url: `${server}/generate-screenplay`,
+          data: {
+            synopsis,
+          },
+        });
+        console.log(`Got a screenplay!`);
+        console.log(data);
+        console.log(` ============== `);
+        return {
+          title: synopsis,
+          scenes: data,
+        };
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
+    },
+    compileVideoFromRaws: async (
+      _parent: any,
+      args: { title: string; urlOfRaws: string[] },
+      _context: CustomContext,
+      _info: any
+    ) => {
+      const { title, urlOfRaws } = args;
+      console.log(`About to hit it...`);
+      const server = process.env.MEDIA_MANIPULATION_ENDPOINT;
+      try {
+        const { data } = await axios({
+          method: "post",
+          url: `${server}/compile-video-from-raws`,
+          data: {
+            title,
+            urlOfRaws,
+          },
+        });
+        console.log(`Compiled video from raws!`);
+        console.log(data);
+        console.log(` ============== `);
+        return data.uploadedZip;
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
     },
   },
   Media: {
